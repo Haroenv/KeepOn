@@ -11,11 +11,12 @@
 # Generated files
 bin/
 gen/
+build/
+crashlytics-build.properties
+manifest-merger-release-report.txt
 
 # Gradle files
 .gradle/
-build/
-/*/build/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -25,3 +26,12 @@ proguard/
 
 # Log Files
 *.log
+
+# IDE files
+*.swp
+.idea
+*.iml
+
+# Keys
+crashlytics.properties
+fabric.properties
