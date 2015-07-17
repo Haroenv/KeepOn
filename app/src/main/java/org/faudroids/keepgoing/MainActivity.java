@@ -1,8 +1,11 @@
 package org.faudroids.keepgoing;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import org.faudroids.keepgoing.ui.GoogleFitDemoActivity;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
@@ -21,7 +24,7 @@ public class MainActivity extends RoboActivity {
 		fitDemoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO
+				startActivity(new Intent(MainActivity.this, GoogleFitDemoActivity.class));
 			}
 		});
 	}
