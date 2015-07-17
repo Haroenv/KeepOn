@@ -30,6 +30,12 @@ abstract class AbstractActivity extends RoboActivity implements ServiceConnectio
 	}
 
 	@Override
+	protected void onStop() {
+		unbindService(this);
+		super.onStop();
+	}
+
+	@Override
 	public final void onServiceConnected(ComponentName name, IBinder binder) {
 		Timber.d("Google API client service conntected");
 		apiClientService = Optional.of(((GoogleApiClientService.LocalBinder) binder).getService());
