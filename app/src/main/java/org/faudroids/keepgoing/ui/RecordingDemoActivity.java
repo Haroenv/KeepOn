@@ -12,14 +12,20 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
+import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.data.Subscription;
+import com.google.android.gms.fitness.request.OnDataPointListener;
+import com.google.android.gms.fitness.request.SensorRequest;
 import com.google.android.gms.fitness.result.ListSubscriptionsResult;
 import com.google.android.gms.fitness.result.SessionStopResult;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.google.GoogleApiClientService;
@@ -34,7 +40,7 @@ import timber.log.Timber;
 @ContentView(R.layout.activity_recording_demo)
 public class RecordingDemoActivity extends AbstractActivity implements OnMapReadyCallback {
 
-	private static final DataType FITNESS_TYPE = DataType.TYPE_LOCATION_TRACK;
+	private static final DataType FITNESS_TYPE = DataType.TYPE_LOCATION_SAMPLE;
 
 	private static final String
 			PREFS_NAME = "org.faudroids.keepgoing.RecordingDemoActivity",
@@ -44,6 +50,9 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 	@InjectView(R.id.map) private MapView mapView;
 	@InjectView(R.id.btn_toggle_recording) private Button toggleRecordingButton;
 	private boolean isRecordingRunning = false;
+
+	private GoogleMap googleMap = null;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -132,6 +141,40 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 				Timber.i("session started: " + status.isSuccess() + " (" + status.toString() + ")");
 			}
 		});
+
+		// start monitoring sensors for live updates
+		Fitness.SensorsApi
+				.add(getGoogleApiClient(), new SensorRequest.Builder()
+								.setDataType(FITNESS_TYPE)
+								.setSamplingRate(15, TimeUnit.SECONDS)
+								.build(),
+						new OnDataPointListener() {
+							@Override
+							public void onDataPoint(final DataPoint dataPoint) {
+								mapView.post(new Runnable() {
+									@Override
+									public void run() {
+										Timber.d("new data point");
+										float lat = dataPoint.getValue(Field.FIELD_LATITUDE).asFloat();
+										float lng = dataPoint.getValue(Field.FIELD_LONGITUDE).asFloat();
+										googleMap.addMarker(new MarkerOptions()
+												.title("Recorded location")
+												.position(new LatLng(lat, lng)));
+										Toast.makeText(RecordingDemoActivity.this, "New data point", Toast.LENGTH_LONG).show();
+									}
+								});
+							}
+						})
+				.setResultCallback(new ResultCallback<Status>() {
+					@Override
+					public void onResult(Status status) {
+						if (status.isSuccess()) {
+							Timber.i("sensor start successful");
+						} else {
+							Timber.e("sensor start failed");
+						}
+					}
+				});
 	}
 
 
@@ -207,6 +250,7 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
 		googleMap.setMyLocationEnabled(true);
+		this.googleMap = googleMap;
 	}
 
 }
