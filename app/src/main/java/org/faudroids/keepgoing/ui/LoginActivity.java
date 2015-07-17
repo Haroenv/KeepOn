@@ -8,7 +8,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.faudroids.keepgoing.google.GoogleApiClientService;
+import org.faudroids.keepgoing.recording.GoogleApiClientService;
 
 import timber.log.Timber;
 

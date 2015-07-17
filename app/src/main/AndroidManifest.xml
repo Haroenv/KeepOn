@@ -33,7 +33,7 @@
             android:name=".ui.RecordingDemoActivity"
             />
         <service
-            android:name=".google.GoogleApiClientService"
+            android:name=".recording.GoogleApiClientService"
             />
 
         <meta-data

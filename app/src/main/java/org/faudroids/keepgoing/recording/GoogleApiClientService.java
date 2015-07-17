@@ -1,4 +1,4 @@
-package org.faudroids.keepgoing.google;
+package org.faudroids.keepgoing.recording;
 
 import android.content.Intent;
 import android.os.Binder;

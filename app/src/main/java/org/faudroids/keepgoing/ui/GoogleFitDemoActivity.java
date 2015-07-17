@@ -14,11 +14,12 @@ import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.data.Value;
-import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
-import com.google.android.gms.fitness.result.DataReadResult;
+import com.google.android.gms.fitness.request.SessionReadRequest;
+import com.google.android.gms.fitness.result.SessionReadResult;
 
 import org.faudroids.keepgoing.R;
 
@@ -102,10 +103,32 @@ public class GoogleFitDemoActivity extends AbstractActivity {
 				cal.add(Calendar.WEEK_OF_YEAR, -1);
 				long startTime = cal.getTimeInMillis();
 
-				DateFormat dateFormat = SimpleDateFormat.getDateInstance();
+				final DateFormat dateFormat = SimpleDateFormat.getDateInstance();
 				Timber.d("Range Start: " + dateFormat.format(startTime));
 				Timber.d("Range End: " + dateFormat.format(endTime));
 
+				SessionReadRequest readRequest = new SessionReadRequest.Builder()
+						.setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
+						.read(DataType.TYPE_LOCATION_SAMPLE)
+						.build();
+
+				Fitness.SessionsApi.readSession(getGoogleApiClient(), readRequest).setResultCallback(new ResultCallback<SessionReadResult>() {
+					@Override
+					public void onResult(SessionReadResult sessionReadResult) {
+						for (Session session : sessionReadResult.getSessions()) {
+							Timber.d(session.getName() + " from " + session.getStartTime(TimeUnit.MILLISECONDS) + " to " + session.getEndTime(TimeUnit.MILLISECONDS));
+
+							for (DataSet dataSet : sessionReadResult.getDataSet(session)) {
+								Timber.d("dataSet " + dataSet.getDataType().getName());
+								for (DataPoint dataPoint : dataSet.getDataPoints()) {
+									Timber.d(dataPoint.getValue(Field.FIELD_LATITUDE).asFloat() + ", " + dataPoint.getValue(Field.FIELD_LONGITUDE).asFloat());
+								}
+							}
+						}
+					}
+				});
+
+				/*
 				DataReadRequest readRequest = new DataReadRequest.Builder()
 						.aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
 						.bucketByTime(1, TimeUnit.DAYS)
@@ -132,6 +155,7 @@ public class GoogleFitDemoActivity extends AbstractActivity {
 						}
 					}
 				});
+				*/
 			}
 		});
 

@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.faudroids.keepgoing.google.GoogleApiClientService;
+import org.faudroids.keepgoing.recording.GoogleApiClientService;
 import org.roboguice.shaded.goole.common.base.Optional;
 
 import roboguice.activity.RoboActivity;
