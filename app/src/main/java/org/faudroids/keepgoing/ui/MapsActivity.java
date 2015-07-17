@@ -8,13 +8,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 
 import org.faudroids.keepgoing.R;
 
-import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import timber.log.Timber;
 
 @ContentView(R.layout.activity_map)
-public class MapsActivity extends RoboActivity implements OnMapReadyCallback {
+public class MapsActivity extends AbstractActivity implements OnMapReadyCallback {
 
 	@InjectView(R.id.map) private MapView mapView;
 

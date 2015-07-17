@@ -1,20 +1,18 @@
-package org.faudroids.keepgoing;
+package org.faudroids.keepgoing.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import org.faudroids.keepgoing.ui.GoogleFitDemoActivity;
-import org.faudroids.keepgoing.ui.MapsActivity;
+import org.faudroids.keepgoing.R;
 
-import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 
 
 @ContentView(R.layout.activity_main)
-public class MainActivity extends RoboActivity {
+public class MainActivity extends AbstractActivity {
 
 	@InjectView(R.id.btn_fit_demo) private Button fitDemoButton;
 	@InjectView(R.id.btn_map_demo) private Button mapDemoButton;
