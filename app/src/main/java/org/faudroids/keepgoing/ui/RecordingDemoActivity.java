@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.Field;
@@ -16,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.faudroids.keepgoing.DefaultTransformer;
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.recording.GoogleApiClientService;
 import org.faudroids.keepgoing.recording.RecordingManager;
@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import rx.functions.Action1;
 
 @ContentView(R.layout.activity_recording_demo)
 public class RecordingDemoActivity extends AbstractActivity implements OnMapReadyCallback {
@@ -56,12 +57,17 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 			@Override
 			public void onClick(View v) {
 				if (!recordingManager.isRecording()) {
-					recordingManager.startRecording(getGoogleApiClient(), new ResultCallback<Status>() {
-						@Override
-						public void onResult(Status status) {
-							Toast.makeText(RecordingDemoActivity.this, "Recording started successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
-						}
-					});
+					// start recording
+					recordingManager
+							.startRecording(getGoogleApiClient())
+							.compose(new DefaultTransformer<Status>())
+							.subscribe(new Action1<Status>() {
+								@Override
+								public void call(Status status) {
+									Toast.makeText(RecordingDemoActivity.this, "Recording started successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
+								}
+							});
+
 					recordingManager.registerDataListener(new RecordingManager.DataListener() {
 						@Override
 						public void onDataChanged(final List<DataPoint> dataPoints) {
@@ -82,13 +88,18 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 							});
 						}
 					});
+
 				} else {
-					recordingManager.stopRecording(getGoogleApiClient(), new ResultCallback<Status>() {
-						@Override
-						public void onResult(Status status) {
-							Toast.makeText(RecordingDemoActivity.this, "Recording stopped successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
-						}
-					});
+					// stop recording
+					recordingManager
+							.stopRecording(getGoogleApiClient())
+							.compose(new DefaultTransformer<Status>())
+							.subscribe(new Action1<Status>() {
+								@Override
+								public void call(Status status) {
+									Toast.makeText(RecordingDemoActivity.this, "Recording stopped successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
+								}
+							});
 					recordingManager.unregisterDataListener();
 				}
 				toggleRecordingButtonText();

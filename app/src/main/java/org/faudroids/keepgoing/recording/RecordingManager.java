@@ -4,7 +4,6 @@ package org.faudroids.keepgoing.recording;
 import android.content.Context;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
@@ -25,6 +24,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import roboguice.inject.ContextSingleton;
+import rx.Observable;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import timber.log.Timber;
 
 @ContextSingleton
@@ -54,27 +56,27 @@ public class RecordingManager {
 	}
 
 
-	public void startRecording(GoogleApiClient googleApiClient, final ResultCallback<Status> statusCallback) {
+	public Observable<Status> startRecording(final GoogleApiClient googleApiClient) {
 		// mark recording start
 		isRecording = true;
 		recordingStartTimestamp = System.currentTimeMillis();
 
 		// start monitoring sensors
-		SensorRequest sensorRequest = new SensorRequest.Builder()
+		final SensorRequest sensorRequest = new SensorRequest.Builder()
 				.setDataType(FITNESS_TYPE)
 				.setSamplingRate(15, TimeUnit.SECONDS)
 				.build();
 
-		Fitness.SensorsApi
-				.add(googleApiClient, sensorRequest, sensorListener)
-				.setResultCallback(new ResultCallback<Status>() {
+		return Observable
+				.defer(new Func0<Observable<Status>>() {
 					@Override
-					public void onResult(Status status) {
-						if (status.isSuccess()) Timber.i("sensor start successful");
-						else Timber.e("sensor start failed (" + status.toString() + ")");
-						statusCallback.onResult(status);
+					public Observable<Status> call() {
+						Status status = Fitness.SensorsApi.add(googleApiClient, sensorRequest, sensorListener).await();
+						if (!status.isSuccess()) isRecording = false;
+						return Observable.just(status);
 					}
-				});
+				})
+				.flatMap(new LoggingFunction("sensor listener started"));
 	}
 
 
@@ -88,64 +90,75 @@ public class RecordingManager {
 	}
 
 
-	public void stopRecording(GoogleApiClient googleApiClient, final ResultCallback<Status> statusCallback) {
-		// remove sensor listener
-		Fitness.SensorsApi.remove(googleApiClient, sensorListener)
-				.setResultCallback(new ResultCallback<Status>() {
-					@Override
-					public void onResult(Status status) {
-						if (status.isSuccess()) Timber.i("stopping sensor listener success");
-						else Timber.e("stopping sensor listener failed (" + status.toString() + ")");
+	public Observable<Status> stopRecording(final GoogleApiClient googleApiClient) {
+		return Observable.defer(new Func0<Observable<Status>>() {
+			@Override
+			public Observable<Status> call() {
+
+				// remove sensor listener
+				Fitness.SensorsApi.remove(googleApiClient, sensorListener).await();
+
+				// discard sessions that do not contain any data points
+				Status saveSessionStatus = null;
+				if (!dataPoints.isEmpty()) {
+					// create session
+					Session session = new Session.Builder()
+							.setName("TheAwesomeKeepGoingSession")
+							.setIdentifier(UUID.randomUUID().toString())
+							.setDescription("A session for testing")
+							.setStartTime(recordingStartTimestamp, TimeUnit.MILLISECONDS)
+							.setEndTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+							.setActivity(FitnessActivities.RUNNING_JOGGING)
+							.build();
+
+					// store session
+					DataSet dataSet = DataSet.create(dataSource);
+					for (DataPoint recordedPoint : dataPoints) {
+						// copy recorded points to new "source"
+						DataPoint newPoint = dataSet.createDataPoint();
+						newPoint.setTimeInterval(
+								recordedPoint.getStartTime(TimeUnit.MILLISECONDS),
+								recordedPoint.getEndTime(TimeUnit.MILLISECONDS),
+								TimeUnit.MILLISECONDS);
+						newPoint.getValue(Field.FIELD_LATITUDE).setFloat(recordedPoint.getValue(Field.FIELD_LATITUDE).asFloat());
+						newPoint.getValue(Field.FIELD_LONGITUDE).setFloat(recordedPoint.getValue(Field.FIELD_LONGITUDE).asFloat());
+						newPoint.getValue(Field.FIELD_ACCURACY).setFloat(recordedPoint.getValue(Field.FIELD_ACCURACY).asFloat());
+						newPoint.getValue(Field.FIELD_ALTITUDE).setFloat(recordedPoint.getValue(Field.FIELD_ALTITUDE).asFloat());
+						dataSet.add(newPoint);
 					}
-				});
+					SessionInsertRequest insertRequest = new SessionInsertRequest.Builder()
+							.setSession(session)
+							.addDataSet(dataSet)
+							.build();
 
-		// discard sessions that do not contain any data points
-		if (!dataPoints.isEmpty()) {
-			// create session
-			Session session = new Session.Builder()
-					.setName("TheAwesomeKeepGoingSession")
-					.setIdentifier(UUID.randomUUID().toString())
-					.setDescription("A session for testing")
-					.setStartTime(recordingStartTimestamp, TimeUnit.MILLISECONDS)
-					.setEndTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-					.setActivity(FitnessActivities.RUNNING_JOGGING)
-					.build();
+					saveSessionStatus = Fitness.SessionsApi.insertSession(googleApiClient, insertRequest).await();
+				}
 
-			// store session
-			DataSet dataSet = DataSet.create(dataSource);
-			for (DataPoint recordedPoint : dataPoints) {
-				// copy recorded points to new "source"
-				DataPoint newPoint = dataSet.createDataPoint();
-				newPoint.setTimeInterval(
-						recordedPoint.getStartTime(TimeUnit.MILLISECONDS),
-						recordedPoint.getEndTime(TimeUnit.MILLISECONDS),
-						TimeUnit.MILLISECONDS);
-				newPoint.getValue(Field.FIELD_LATITUDE).setFloat(recordedPoint.getValue(Field.FIELD_LATITUDE).asFloat());
-				newPoint.getValue(Field.FIELD_LONGITUDE).setFloat(recordedPoint.getValue(Field.FIELD_LONGITUDE).asFloat());
-				newPoint.getValue(Field.FIELD_ACCURACY).setFloat(recordedPoint.getValue(Field.FIELD_ACCURACY).asFloat());
-				newPoint.getValue(Field.FIELD_ALTITUDE).setFloat(recordedPoint.getValue(Field.FIELD_ALTITUDE).asFloat());
-				dataSet.add(newPoint);
+				// clear recording state
+				isRecording = false;
+				dataPoints.clear();
+				recordingStartTimestamp = 0;
+
+				return Observable.just(saveSessionStatus);
 			}
-			SessionInsertRequest insertRequest = new SessionInsertRequest.Builder()
-					.setSession(session)
-					.addDataSet(dataSet)
-					.build();
+		});
+	}
 
-			Fitness.SessionsApi.insertSession(googleApiClient, insertRequest)
-					.setResultCallback(new ResultCallback<Status>() {
-						@Override
-						public void onResult(Status status) {
-							if (status.isSuccess()) Timber.i("session insert successful");
-							else Timber.e("session insert failed (" + status.toString() + ")");
-							statusCallback.onResult(status);
-						}
-					});
+
+	private class LoggingFunction implements Func1<Status, Observable<Status>> {
+
+		private final String message;
+
+		public LoggingFunction(String message) {
+			this.message = message;
 		}
 
-		// clear recording state
-		isRecording = false;
-		dataPoints.clear();
-		recordingStartTimestamp = 0;
+		@Override
+		public Observable<Status> call(Status status) {
+			if (status.isSuccess()) Timber.i(message + ": " + status.isSuccess());
+			else Timber.e(message + ": " + status.isSuccess() + " (" + status.toString() + ")");
+			return Observable.just(status);
+		}
 	}
 
 
