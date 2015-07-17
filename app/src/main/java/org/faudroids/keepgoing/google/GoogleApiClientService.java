@@ -28,6 +28,7 @@ public class GoogleApiClientService extends RoboService {
 		super.onCreate();
 		googleApiClient = new GoogleApiClient.Builder(this)
 				.addApi(Fitness.SENSORS_API)
+				.addApi(Fitness.SESSIONS_API)
 				.addApi(Fitness.HISTORY_API)
 				.addApi(Fitness.RECORDING_API)
 				.addScope(new Scope(Scopes.FITNESS_LOCATION_READ_WRITE))

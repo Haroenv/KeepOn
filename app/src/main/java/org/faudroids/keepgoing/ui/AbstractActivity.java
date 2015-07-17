@@ -14,6 +14,7 @@ import org.faudroids.keepgoing.google.GoogleApiClientService;
 import org.roboguice.shaded.goole.common.base.Optional;
 
 import roboguice.activity.RoboActivity;
+import timber.log.Timber;
 
 abstract class AbstractActivity extends RoboActivity implements ServiceConnection {
 
@@ -30,6 +31,7 @@ abstract class AbstractActivity extends RoboActivity implements ServiceConnectio
 
 	@Override
 	public final void onServiceConnected(ComponentName name, IBinder binder) {
+		Timber.d("Google API client service conntected");
 		apiClientService = Optional.of(((GoogleApiClientService.LocalBinder) binder).getService());
 		onServiceConnected(apiClientService.get());
 	}
@@ -50,9 +52,9 @@ abstract class AbstractActivity extends RoboActivity implements ServiceConnectio
 	protected boolean assertIsGoogleApiClientConnected() {
 		if (!apiClientService.isPresent() || !apiClientService.get().getGoogleApiClient().isConnected()) {
 			Toast.makeText(this, "Google API client not connected", Toast.LENGTH_SHORT).show();
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	/**
