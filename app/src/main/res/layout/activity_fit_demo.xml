@@ -11,4 +11,39 @@
         android:layout_height="wrap_content"
         />
 
+    <Button
+        android:id="@+id/btn_start_recording"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start recording"
+        />
+
+    <Button
+        android:id="@+id/btn_stop_recording"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop recording"
+        />
+
+    <Button
+        android:id="@+id/btn_read_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Read data"
+        />
+
+    <Button
+        android:id="@+id/btn_start_sensor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start sensor"
+        />
+
+    <Button
+        android:id="@+id/btn_stop_sensor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop sensor"
+        />
+
 </LinearLayout>
