@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,6 +37,7 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 
 	@InjectView(R.id.map) private MapView mapView;
 	@InjectView(R.id.btn_toggle_recording) private Button toggleRecordingButton;
+	@InjectView(R.id.txt_distance) private TextView distanceTextView;
 	private GoogleMap googleMap = null;
 
 
@@ -54,8 +56,9 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 		// restore button state
 		toggleRecordingButtonText();
 
-		// restore map state
-		dataListener.onDataChanged(recordingManager.getDataPoints());
+		// restore map + distance state
+		dataListener.onLocationChanged(recordingManager.getLocationData());
+		dataListener.onDistanceChanged(recordingManager.getDistanceData());
 
 		// start / stop recording
 		toggleRecordingButton.setOnClickListener(new View.OnClickListener() {
@@ -145,7 +148,7 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 	private class DataListener implements RecordingManager.DataListener {
 
 		@Override
-		public void onDataChanged(final List<DataPoint> dataPoints) {
+		public void onLocationChanged(final List<DataPoint> locationData) {
 			// update view on UI thread
 			mapView.post(new Runnable() {
 				@Override
@@ -153,7 +156,7 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 					// add polyline to map
 					googleMap.clear();
 					PolylineOptions polylineOptions = new PolylineOptions();
-					for (DataPoint point : dataPoints) {
+					for (DataPoint point : locationData) {
 						polylineOptions.add(new LatLng(
 								point.getValue(Field.FIELD_LATITUDE).asFloat(),
 								point.getValue(Field.FIELD_LONGITUDE).asFloat()));
@@ -163,6 +166,15 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 							.color(Color.BLUE));
 				}
 			});
+		}
+
+		@Override
+		public void onDistanceChanged(List<DataPoint> distanceData) {
+			float distance = 0;
+			for (DataPoint point : distanceData) {
+				distance += point.getValue(Field.FIELD_DISTANCE).asFloat();
+			}
+			distanceTextView.setText(distance + " m");
 		}
 
 	}
