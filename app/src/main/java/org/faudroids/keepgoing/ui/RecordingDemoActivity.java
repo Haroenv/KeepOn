@@ -92,7 +92,7 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 				} else {
 					// stop recording
 					recordingManager
-							.stopRecording(getGoogleApiClient())
+							.stopAndSaveRecording(getGoogleApiClient())
 							.compose(new DefaultTransformer<Status>())
 							.subscribe(new Action1<Status>() {
 								@Override
