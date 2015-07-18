@@ -2,6 +2,7 @@ package org.faudroids.keepgoing.recording;
 
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
@@ -35,6 +36,7 @@ public class RecordingManager {
 
 	private static final DataType FITNESS_TYPE = DataType.TYPE_LOCATION_SAMPLE;
 
+	private final Context context;
 	private final DataSource dataSource;
 	private final SensorListener sensorListener = new SensorListener();
 
@@ -44,6 +46,7 @@ public class RecordingManager {
 
 	@Inject
 	RecordingManager(Context context) {
+		this.context = context;
 		this.dataSource = new DataSource.Builder()
 				.setAppPackageName(context)
 				.setDataType(FITNESS_TYPE)
@@ -72,6 +75,10 @@ public class RecordingManager {
 				.defer(new Func0<Observable<Status>>() {
 					@Override
 					public Observable<Status> call() {
+						// start service
+						context.startService(new Intent(context, RecordingService.class));
+
+						// start listener
 						Status status = Fitness.SensorsApi.add(googleApiClient, sensorRequest, sensorListener).await();
 						if (!status.isSuccess()) isRecording = false;
 						return Observable.just(status);
@@ -146,7 +153,8 @@ public class RecordingManager {
 									@Override
 									public Observable<Status> call(Status stopStatus) {
 										// return error status is present
-										if (!stopStatus.isSuccess()) return Observable.just(stopStatus);
+										if (!stopStatus.isSuccess())
+											return Observable.just(stopStatus);
 										return Observable.just(saveStatus);
 									}
 								});
@@ -164,6 +172,9 @@ public class RecordingManager {
 				isRecording = false;
 				dataPoints.clear();
 				recordingStartTimestamp = 0;
+
+				// stop service
+				context.stopService(new Intent(context, RecordingService.class));
 
 				// remove sensor listener
 				Status status = Fitness.SensorsApi.remove(googleApiClient, sensorListener).await();
@@ -201,6 +212,7 @@ public class RecordingManager {
 		}
 
 	}
+
 
 	public interface DataListener {
 

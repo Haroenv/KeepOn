@@ -35,6 +35,9 @@
         <service
             android:name=".recording.GoogleApiClientService"
             />
+        <service
+            android:name=".recording.RecordingService"
+            />
 
         <meta-data
             android:name="com.google.android.gms.version"
