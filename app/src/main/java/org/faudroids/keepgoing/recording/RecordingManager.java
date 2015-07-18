@@ -60,6 +60,11 @@ public class RecordingManager {
 	}
 
 
+	public List<DataPoint> getDataPoints() {
+		return dataPoints;
+	}
+
+
 	public Observable<Status> startRecording(final GoogleApiClient googleApiClient) {
 		// mark recording start
 		isRecording = true;
@@ -153,7 +158,7 @@ public class RecordingManager {
 									@Override
 									public Observable<Status> call(Status stopStatus) {
 										// return error status is present
-										if (!stopStatus.isSuccess())
+										if (!stopStatus.isSuccess() || saveStatus == null)
 											return Observable.just(stopStatus);
 										return Observable.just(saveStatus);
 									}

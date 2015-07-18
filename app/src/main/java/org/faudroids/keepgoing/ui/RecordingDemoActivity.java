@@ -32,6 +32,8 @@ import rx.functions.Action1;
 public class RecordingDemoActivity extends AbstractActivity implements OnMapReadyCallback {
 
 	@Inject private RecordingManager recordingManager;
+	private final DataListener dataListener = new DataListener();
+
 	@InjectView(R.id.map) private MapView mapView;
 	@InjectView(R.id.btn_toggle_recording) private Button toggleRecordingButton;
 	private GoogleMap googleMap = null;
@@ -49,7 +51,11 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 
 	@Override
 	protected void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
+		// restore button state
 		toggleRecordingButtonText();
+
+		// restore map state
+		dataListener.onDataChanged(recordingManager.getDataPoints());
 
 		// start / stop recording
 		toggleRecordingButton.setOnClickListener(new View.OnClickListener() {
@@ -59,34 +65,14 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 					// start recording
 					recordingManager
 							.startRecording(googleApiClient)
-									.compose(new DefaultTransformer<Status>())
-									.subscribe(new Action1<Status>() {
-										@Override
-										public void call(Status status) {
-											Toast.makeText(RecordingDemoActivity.this, "Recording started successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
-										}
-									});
-
-					recordingManager.registerDataListener(new RecordingManager.DataListener() {
-						@Override
-						public void onDataChanged(final List<DataPoint> dataPoints) {
-							mapView.post(new Runnable() {
+							.compose(new DefaultTransformer<Status>())
+							.subscribe(new Action1<Status>() {
 								@Override
-								public void run() {
-									googleMap.clear();
-									PolylineOptions polylineOptions = new PolylineOptions();
-									for (DataPoint point : dataPoints) {
-										polylineOptions.add(new LatLng(
-												point.getValue(Field.FIELD_LATITUDE).asFloat(),
-												point.getValue(Field.FIELD_LONGITUDE).asFloat()));
-									}
-									googleMap.addPolyline(polylineOptions
-											.width(5)
-											.color(Color.BLUE));
+								public void call(Status status) {
+									Toast.makeText(RecordingDemoActivity.this, "Recording started successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
+									toggleRecordingButtonText();
 								}
 							});
-						}
-					});
 
 				} else {
 					// stop recording
@@ -97,11 +83,10 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 								@Override
 								public void call(Status status) {
 									Toast.makeText(RecordingDemoActivity.this, "Recording stopped successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
+									toggleRecordingButtonText();
 								}
 							});
-					recordingManager.unregisterDataListener();
 				}
-				toggleRecordingButtonText();
 			}
 		});
 	}
@@ -117,11 +102,13 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 	public void onResume() {
 		super.onResume();
 		mapView.onResume();
+		recordingManager.registerDataListener(dataListener);
 	}
 
 
 	@Override
 	public void onPause() {
+		recordingManager.unregisterDataListener();
 		mapView.onPause();
 		super.onPause();
 	}
@@ -152,6 +139,32 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 	public void onMapReady(GoogleMap googleMap) {
 		googleMap.setMyLocationEnabled(true);
 		this.googleMap = googleMap;
+	}
+
+
+	private class DataListener implements RecordingManager.DataListener {
+
+		@Override
+		public void onDataChanged(final List<DataPoint> dataPoints) {
+			// update view on UI thread
+			mapView.post(new Runnable() {
+				@Override
+				public void run() {
+					// add polyline to map
+					googleMap.clear();
+					PolylineOptions polylineOptions = new PolylineOptions();
+					for (DataPoint point : dataPoints) {
+						polylineOptions.add(new LatLng(
+								point.getValue(Field.FIELD_LATITUDE).asFloat(),
+								point.getValue(Field.FIELD_LONGITUDE).asFloat()));
+					}
+					googleMap.addPolyline(polylineOptions
+							.width(5)
+							.color(Color.BLUE));
+				}
+			});
+		}
+
 	}
 
 }
