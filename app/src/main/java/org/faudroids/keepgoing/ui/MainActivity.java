@@ -16,6 +16,7 @@ public class MainActivity extends AbstractActivity {
 	@InjectView(R.id.btn_fit_demo) private Button fitDemoButton;
 	@InjectView(R.id.btn_map_demo) private Button mapDemoButton;
 	@InjectView(R.id.btn_recording_demo) private Button recordingDemoButton;
+	@InjectView(R.id.btn_show_sessions) private Button showSessionsButton;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,13 @@ public class MainActivity extends AbstractActivity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(MainActivity.this, RecordingDemoActivity.class));
+			}
+		});
+
+		showSessionsButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(MainActivity.this, SessionsOverviewActivity.class));
 			}
 		});
 	}

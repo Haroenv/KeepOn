@@ -16,8 +16,9 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.request.SensorRequest;
-import com.google.android.gms.fitness.request.SessionInsertRequest;
 import com.google.inject.Inject;
+
+import org.faudroids.keepgoing.sessions.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class RecordingManager {
 	private final Context context;
 	private final DataSource locationDataSource, distanceDataSource;
 	private final SensorListener sensorListener = new SensorListener();
+	private final SessionManager sessionManager;
 
 	private boolean isRecording = false;
 	private long recordingStartTimestamp;
@@ -46,8 +48,9 @@ public class RecordingManager {
 			distanceData = new ArrayList<>(); // distance deltas
 
 	@Inject
-	RecordingManager(Context context) {
+	RecordingManager(Context context, SessionManager sessionManager) {
 		this.context = context;
+		this.sessionManager = sessionManager;
 
 		DataSource.Builder sourceBuilder = new DataSource.Builder()
 				.setAppPackageName(context)
@@ -130,7 +133,16 @@ public class RecordingManager {
 		return stopAndDiscardRecording(googleApiClient)
 				.flatMap(new Func1<Status, Observable<Status>>() {
 					@Override
-					public Observable<Status> call(Status stopSensorsStatus) {
+					public Observable<Status> call(final Status stopSensorsStatus) {
+						// create location data
+						DataSet locationDataSet = dataToDataSet(locationDataSource, locationData, Field.FIELD_LATITUDE, Field.FIELD_LONGITUDE, Field.FIELD_ACCURACY, Field.FIELD_ALTITUDE);
+						DataSet distanceDataSet = dataToDataSet(distanceDataSource, distanceData, Field.FIELD_DISTANCE);
+
+						// discard empty sessions
+						if (locationDataSet.isEmpty() || distanceDataSet.isEmpty()) {
+							return Observable.just(stopSensorsStatus);
+						}
+
 						// create session
 						Session session = new Session.Builder()
 								.setName("TheAwesomeKeepGoingSession")
@@ -141,24 +153,15 @@ public class RecordingManager {
 								.setActivity(FitnessActivities.RUNNING_JOGGING)
 								.build();
 
-						// create location data
-						DataSet locationDataSet = dataToDataSet(locationDataSource, locationData, Field.FIELD_LATITUDE, Field.FIELD_LONGITUDE, Field.FIELD_ACCURACY, Field.FIELD_ALTITUDE);
-						DataSet distanceDataSet = dataToDataSet(distanceDataSource, distanceData, Field.FIELD_DISTANCE);
 
-						// discard sessions that do not contain any data points
-						Status saveSessionStatus = null;
-						if (!locationDataSet.isEmpty() && !distanceDataSet.isEmpty()) {
-							SessionInsertRequest insertRequest = new SessionInsertRequest.Builder()
-									.setSession(session)
-									.addDataSet(locationDataSet)
-									.addDataSet(distanceDataSet)
-									.build();
-
-							saveSessionStatus = Fitness.SessionsApi.insertSession(googleApiClient, insertRequest).await();
-						}
-
-						return Observable.just(combineStatus(saveSessionStatus, stopSensorsStatus));
-
+						// save session
+						return sessionManager.createSession(googleApiClient, session, locationDataSet, distanceDataSet)
+								.flatMap(new Func1<Status, Observable<Status>>() {
+									@Override
+									public Observable<Status> call(Status saveSessionStatus) {
+										return Observable.just(combineStatus(saveSessionStatus, stopSensorsStatus));
+									}
+								});
 					}
 				});
 	}

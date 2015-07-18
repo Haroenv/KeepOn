@@ -26,4 +26,11 @@
         android:text="Recording demo"
         />
 
+    <Button
+        android:id="@+id/btn_show_sessions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show sessions"
+        />
+
 </LinearLayout>
