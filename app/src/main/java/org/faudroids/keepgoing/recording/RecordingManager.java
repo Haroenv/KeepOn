@@ -42,7 +42,6 @@ public class RecordingManager {
 	private final SessionManager sessionManager;
 
 	private boolean isRecording = false;
-	private long recordingStartTimestamp;
 	private List<DataPoint>
 			locationData = new ArrayList<>(),
 			distanceData = new ArrayList<>(); // distance deltas
@@ -78,7 +77,6 @@ public class RecordingManager {
 	public Observable<Status> startRecording(final GoogleApiClient googleApiClient) {
 		// mark recording start
 		isRecording = true;
-		recordingStartTimestamp = System.currentTimeMillis();
 
 		// start both location and distance sensors
 		return Observable.zip(
@@ -129,53 +127,68 @@ public class RecordingManager {
 
 
 	public Observable<Status> stopAndSaveRecording(final GoogleApiClient googleApiClient) {
-
-		return stopAndDiscardRecording(googleApiClient)
+		return stopRecording(googleApiClient)
 				.flatMap(new Func1<Status, Observable<Status>>() {
 					@Override
-					public Observable<Status> call(final Status stopSensorsStatus) {
+					public Observable<Status> call(final Status stopStatus) {
 						// create location data
 						DataSet locationDataSet = dataToDataSet(locationDataSource, locationData, Field.FIELD_LATITUDE, Field.FIELD_LONGITUDE, Field.FIELD_ACCURACY, Field.FIELD_ALTITUDE);
 						DataSet distanceDataSet = dataToDataSet(distanceDataSource, distanceData, Field.FIELD_DISTANCE);
 
-						// discard empty sessions
-						if (locationDataSet.isEmpty() || distanceDataSet.isEmpty()) {
-							return Observable.just(stopSensorsStatus);
+						Observable<Status> resultObservable;
+
+						if (!locationDataSet.isEmpty() && !distanceDataSet.isEmpty()) {
+							// create session
+							long startTimestamp = distanceDataSet.getDataPoints().get(0).getStartTime(TimeUnit.MILLISECONDS);
+							Session session = new Session.Builder()
+									.setName("TheAwesomeKeepGoingSession")
+									.setIdentifier(UUID.randomUUID().toString())
+									.setDescription("A session for testing")
+									.setStartTime(startTimestamp, TimeUnit.MILLISECONDS)
+									.setEndTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+									.setActivity(FitnessActivities.RUNNING_JOGGING)
+									.build();
+
+							Timber.d("setting session id to " + session.getIdentifier());
+							lastSessionId = session.getIdentifier();
+
+							// save session
+							resultObservable = sessionManager.createSession(googleApiClient, session, locationDataSet, distanceDataSet);
+
+						} else {
+							// discard empty sessions
+							Timber.w("discarding empty session");
+							resultObservable = Observable.just(null);
 						}
 
-						// create session
-						Session session = new Session.Builder()
-								.setName("TheAwesomeKeepGoingSession")
-								.setIdentifier(UUID.randomUUID().toString())
-								.setDescription("A session for testing")
-								.setStartTime(recordingStartTimestamp, TimeUnit.MILLISECONDS)
-								.setEndTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-								.setActivity(FitnessActivities.RUNNING_JOGGING)
-								.build();
-
-
-						// save session
-						return sessionManager.createSession(googleApiClient, session, locationDataSet, distanceDataSet)
-								.flatMap(new Func1<Status, Observable<Status>>() {
-									@Override
-									public Observable<Status> call(Status saveSessionStatus) {
-										return Observable.just(combineStatus(saveSessionStatus, stopSensorsStatus));
-									}
-								});
+						return resultObservable.flatMap(new Func1<Status, Observable<Status>>() {
+							@Override
+							public Observable<Status> call(Status saveStatus) {
+								return Observable.just(combineStatus(stopStatus, saveStatus));
+							}
+						});
 					}
 				});
 	}
 
 
-	public Observable<Status> stopAndDiscardRecording(final GoogleApiClient googleApiClient) {
+	public Observable<Status> stopAndDiscardRecording(GoogleApiClient googleApiClient) {
+		resetRecording();
+		return stopRecording(googleApiClient);
+	}
+
+
+	private void resetRecording() {
+		isRecording = false;
+		distanceData.clear();
+		locationData.clear();
+	}
+
+
+	private Observable<Status> stopRecording(final GoogleApiClient googleApiClient) {
 		return Observable.defer(new Func0<Observable<Status>>() {
 			@Override
 			public Observable<Status> call() {
-				// clear recording state
-				isRecording = false;
-				distanceData.clear();
-				locationData.clear();
-
 				// stop service
 				context.stopService(new Intent(context, RecordingService.class));
 
