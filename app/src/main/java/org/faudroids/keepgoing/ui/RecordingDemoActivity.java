@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.Field;
@@ -17,7 +18,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.faudroids.keepgoing.DefaultTransformer;
 import org.faudroids.keepgoing.R;
-import org.faudroids.keepgoing.recording.GoogleApiClientService;
 import org.faudroids.keepgoing.recording.RecordingManager;
 
 import java.util.List;
@@ -48,8 +48,7 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 
 
 	@Override
-	protected void onServiceConnected(GoogleApiClientService service) {
-		if (!assertIsGoogleApiClientConnected()) return;
+	protected void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		toggleRecordingButtonText();
 
 		// start / stop recording
@@ -59,14 +58,14 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 				if (!recordingManager.isRecording()) {
 					// start recording
 					recordingManager
-							.startRecording(getGoogleApiClient())
-							.compose(new DefaultTransformer<Status>())
-							.subscribe(new Action1<Status>() {
-								@Override
-								public void call(Status status) {
-									Toast.makeText(RecordingDemoActivity.this, "Recording started successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
-								}
-							});
+							.startRecording(googleApiClient)
+									.compose(new DefaultTransformer<Status>())
+									.subscribe(new Action1<Status>() {
+										@Override
+										public void call(Status status) {
+											Toast.makeText(RecordingDemoActivity.this, "Recording started successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
+										}
+									});
 
 					recordingManager.registerDataListener(new RecordingManager.DataListener() {
 						@Override
@@ -92,7 +91,7 @@ public class RecordingDemoActivity extends AbstractActivity implements OnMapRead
 				} else {
 					// stop recording
 					recordingManager
-							.stopAndSaveRecording(getGoogleApiClient())
+							.stopAndSaveRecording(googleApiClient)
 							.compose(new DefaultTransformer<Status>())
 							.subscribe(new Action1<Status>() {
 								@Override

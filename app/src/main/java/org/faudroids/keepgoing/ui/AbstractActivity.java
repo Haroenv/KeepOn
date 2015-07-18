@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.faudroids.keepgoing.recording.GoogleApiClientService;
@@ -18,7 +19,7 @@ import timber.log.Timber;
 
 abstract class AbstractActivity extends RoboActivity implements ServiceConnection {
 
-	private Optional<GoogleApiClientService> apiClientService = Optional.absent();
+	private GoogleApiClientService apiClientService = null;
 
 	@Override
 	protected void onStart() {
@@ -32,23 +33,39 @@ abstract class AbstractActivity extends RoboActivity implements ServiceConnectio
 	@Override
 	protected void onStop() {
 		unbindService(this);
+		if (apiClientService != null) apiClientService.unregisterConnectionListener();
 		super.onStop();
 	}
 
 	@Override
 	public final void onServiceConnected(ComponentName name, IBinder binder) {
 		Timber.d("Google API client service conntected");
-		apiClientService = Optional.of(((GoogleApiClientService.LocalBinder) binder).getService());
-		onServiceConnected(apiClientService.get());
+
+		// store service ref and check if api client has been connected
+		apiClientService = ((GoogleApiClientService.LocalBinder) binder).getService();
+		if (isGoogleApiClientConnected()) onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
+
+		// start listening for api connection
+		apiClientService.registerConnectionListener(new GoogleApiClientService.CombinedConnectionListener() {
+			@Override
+			public void onConnected() {
+				onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
+			}
+
+			@Override
+			public void onConnectionFailed(ConnectionResult connectionResult) {
+				onGoogleAliClientConnectionFailed(connectionResult);
+			}
+		});
 	}
 
 	@Override
 	public final void onServiceDisconnected(ComponentName name) {
-		apiClientService = Optional.absent();
+		apiClientService = null;
 	}
 
 	protected Optional<GoogleApiClientService> getGoogleApiClientService() {
-		return apiClientService;
+		return Optional.fromNullable(apiClientService);
 	}
 
 	/**
@@ -56,11 +73,15 @@ abstract class AbstractActivity extends RoboActivity implements ServiceConnectio
 	 * an error message will be shown.
 	 */
 	protected boolean assertIsGoogleApiClientConnected() {
-		if (!apiClientService.isPresent() || !apiClientService.get().getGoogleApiClient().isConnected()) {
+		if (!isGoogleApiClientConnected()) {
 			Toast.makeText(this, "Google API client not connected", Toast.LENGTH_SHORT).show();
 			return false;
 		}
 		return true;
+	}
+
+	private boolean isGoogleApiClientConnected() {
+		return apiClientService != null && apiClientService.getGoogleApiClient().isConnected();
 	}
 
 	/**
@@ -68,14 +89,19 @@ abstract class AbstractActivity extends RoboActivity implements ServiceConnectio
 	 * have been connected
 	 */
 	protected GoogleApiClient getGoogleApiClient() {
-		return apiClientService.get().getGoogleApiClient();
+		if (apiClientService != null) return apiClientService.getGoogleApiClient();
+		return null;
 	}
 
 	/**
 	 * Called when the {@link GoogleApiClientService} is bound to this activity.
 	 */
-	protected void onServiceConnected(GoogleApiClientService service) {
+	protected void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
 		// override when required
+	}
+
+	protected void onGoogleAliClientConnectionFailed(ConnectionResult connectionResult) {
+		// nothing to do for now
 	}
 
 }
