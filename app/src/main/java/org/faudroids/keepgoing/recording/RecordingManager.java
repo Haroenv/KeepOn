@@ -3,10 +3,11 @@ package org.faudroids.keepgoing.recording;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
@@ -14,8 +15,9 @@ import com.google.android.gms.fitness.data.DataSource;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Session;
-import com.google.android.gms.fitness.request.OnDataPointListener;
-import com.google.android.gms.fitness.request.SensorRequest;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.inject.Inject;
 
 import org.faudroids.keepgoing.sessions.SessionManager;
@@ -30,32 +32,30 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import timber.log.Timber;
 
 @Singleton
 public class RecordingManager {
 
 	private final Context context;
-	private final DataSource locationDataSource, distanceDataSource;
-	private final SensorListener sensorListener = new SensorListener();
+	private final DataSource locationDataSource;
+	private final LocationListenerAdapter locationListenerAdapter = new LocationListenerAdapter();
 	private final SessionManager sessionManager;
 
 	private boolean isRecording = false;
-	private List<DataPoint>
-			locationData = new ArrayList<>(),
-			distanceData = new ArrayList<>(); // distance deltas
+	private final List<Location> recordedLocations = new ArrayList<>();
 
 	@Inject
 	RecordingManager(Context context, SessionManager sessionManager) {
+		Toast.makeText(context, "Creating RecordingManager", Toast.LENGTH_LONG).show();
 		this.context = context;
 		this.sessionManager = sessionManager;
 
-		DataSource.Builder sourceBuilder = new DataSource.Builder()
+		this.locationDataSource = new DataSource.Builder()
 				.setAppPackageName(context)
-				.setType(DataSource.TYPE_RAW);
-		this.locationDataSource = sourceBuilder.setDataType(DataType.TYPE_LOCATION_SAMPLE).build();
-		this.distanceDataSource = sourceBuilder.setDataType(DataType.TYPE_DISTANCE_DELTA).build();
+				.setType(DataSource.TYPE_RAW)
+				.setDataType(DataType.TYPE_LOCATION_SAMPLE)
+				.build();
 	}
 
 
@@ -64,155 +64,102 @@ public class RecordingManager {
 	}
 
 
-	public List<DataPoint> getLocationData() {
-		return locationData;
+	public List<Location> getRecordedLocations() {
+		return recordedLocations;
 	}
 
 
-	public List<DataPoint> getDistanceData() {
-		return distanceData;
-	}
-
-
-	public Observable<Status> startRecording(final GoogleApiClient googleApiClient) {
+	public void startRecording(final GoogleApiClient googleApiClient) {
 		// mark recording start
 		isRecording = true;
 
-		// start both location and distance sensors
-		return Observable.zip(
-				startRecording(googleApiClient, DataType.TYPE_LOCATION_SAMPLE),
-				startRecording(googleApiClient, DataType.TYPE_DISTANCE_DELTA),
-				new Func2<Status, Status, Status>() {
-					@Override
-					public Status call(Status locationSensorStatus, Status distanceSensorStatus) {
-						boolean success = locationSensorStatus.isSuccess() && distanceSensorStatus.isSuccess();
+		// start recording service
+		context.startService(new Intent(context, RecordingService.class));
 
-						// start service
-						if (success) context.startService(new Intent(context, RecordingService.class));
-						else isRecording = false;
+		// start location updates
+		LocationRequest locationRequest = new LocationRequest();
+		locationRequest.setInterval(10000);
+		locationRequest.setFastestInterval(5000);
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-						return combineStatus(locationSensorStatus, distanceSensorStatus);
-					}
-				});
+		LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationListenerAdapter);
 	}
 
 
-	private Observable<Status> startRecording(final GoogleApiClient googleApiClient, DataType dataType) {
-		final SensorRequest sensorRequest = new SensorRequest.Builder()
-				.setDataType(dataType)
-				.setSamplingRate(15, TimeUnit.SECONDS)
-				.build();
-
-		return Observable
-				.defer(new Func0<Observable<Status>>() {
-					@Override
-					public Observable<Status> call() {
-						// start listener
-						Status status = Fitness.SensorsApi.add(googleApiClient, sensorRequest, sensorListener).await();
-						return Observable.just(status);
-					}
-				})
-				.flatMap(new LoggingFunction("sensor listener " + dataType.getName() + " started"));
+	public void registerRecordingListener(RecordingListener recordingListener) {
+		locationListenerAdapter.recordingListener = recordingListener;
 	}
 
 
-	public void registerDataListener(DataListener dataListener) {
-		sensorListener.dataListener = dataListener;
-	}
-
-
-	public void unregisterDataListener() {
-		sensorListener.dataListener = null;
+	public void unregisterRecordingListener() {
+		locationListenerAdapter.recordingListener = null;
 	}
 
 
 	public Observable<Status> stopAndSaveRecording(final GoogleApiClient googleApiClient) {
-		return stopRecording(googleApiClient)
-				.flatMap(new Func1<Status, Observable<Status>>() {
-					@Override
-					public Observable<Status> call(final Status stopStatus) {
-						// create location data
-						DataSet locationDataSet = dataToDataSet(locationDataSource, locationData, Field.FIELD_LATITUDE, Field.FIELD_LONGITUDE, Field.FIELD_ACCURACY, Field.FIELD_ALTITUDE);
-						DataSet distanceDataSet = dataToDataSet(distanceDataSource, distanceData, Field.FIELD_DISTANCE);
-
-						Observable<Status> resultObservable;
-
-						if (!locationDataSet.isEmpty() && !distanceDataSet.isEmpty()) {
-							// create session
-							long startTimestamp = distanceDataSet.getDataPoints().get(0).getStartTime(TimeUnit.MILLISECONDS);
-							Session session = new Session.Builder()
-									.setName("TheAwesomeKeepGoingSession")
-									.setIdentifier(UUID.randomUUID().toString())
-									.setDescription("A session for testing")
-									.setStartTime(startTimestamp, TimeUnit.MILLISECONDS)
-									.setEndTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-									.setActivity(FitnessActivities.RUNNING_JOGGING)
-									.build();
-
-							// save session
-							resultObservable = sessionManager.createSession(googleApiClient, session, locationDataSet, distanceDataSet);
-
-						} else {
-							// discard empty sessions
-							Timber.w("discarding empty session");
-							resultObservable = Observable.just(null);
-						}
-
-						resetRecording();
-
-						return resultObservable.flatMap(new Func1<Status, Observable<Status>>() {
-							@Override
-							public Observable<Status> call(Status saveStatus) {
-								return Observable.just(combineStatus(stopStatus, saveStatus));
-							}
-						});
-					}
-				});
-	}
-
-
-	public Observable<Status> stopAndDiscardRecording(GoogleApiClient googleApiClient) {
-		resetRecording();
-		return stopRecording(googleApiClient);
-	}
-
-
-	private void resetRecording() {
-		isRecording = false;
-		distanceData.clear();
-		locationData.clear();
-	}
-
-
-	private Observable<Status> stopRecording(final GoogleApiClient googleApiClient) {
+		Timber.d("storing " + recordedLocations.size() + " locations");
 		return Observable.defer(new Func0<Observable<Status>>() {
 			@Override
 			public Observable<Status> call() {
-				// stop service
-				context.stopService(new Intent(context, RecordingService.class));
+				// create location data
+				DataSet locationDataSet = recordedLocationsToDataSet();
 
-				// remove sensor listener
-				Status status = Fitness.SensorsApi.remove(googleApiClient, sensorListener).await();
-				return Observable.just(status);
+				Observable<Status> resultObservable;
+
+				if (!locationDataSet.isEmpty()) {
+					// create session
+					long startTimestamp = locationDataSet.getDataPoints().get(0).getTimestamp(TimeUnit.MILLISECONDS);
+					Session session = new Session.Builder()
+							.setName("TheAwesomeKeepGoingSession")
+							.setIdentifier(UUID.randomUUID().toString())
+							.setDescription("A session for testing")
+							.setStartTime(startTimestamp, TimeUnit.MILLISECONDS)
+							.setEndTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+							.setActivity(FitnessActivities.RUNNING_JOGGING)
+							.build();
+
+					// save session
+					resultObservable = sessionManager.createSession(googleApiClient, session, locationDataSet);
+
+				} else {
+					// discard empty sessions
+					Timber.w("discarding empty session");
+					resultObservable = Observable.just(null);
+				}
+
+				stopAndDiscardRecording(googleApiClient);
+				return resultObservable;
 			}
 		});
 	}
 
 
-	private DataSet dataToDataSet(DataSource dataSource, List<DataPoint> dataPoints, Field ... fields) {
-		final DataSet dataSet = DataSet.create(dataSource);
-		for (DataPoint recordedPoint : dataPoints) {
-			// copy recorded points to new "source"
-			DataPoint newPoint = dataSet.createDataPoint();
-			newPoint.setTimeInterval(
-					recordedPoint.getStartTime(TimeUnit.MILLISECONDS),
-					recordedPoint.getEndTime(TimeUnit.MILLISECONDS),
-					TimeUnit.MILLISECONDS);
+	public void stopAndDiscardRecording(GoogleApiClient googleApiClient) {
+		stopRecording(googleApiClient);
+		resetRecording();
+	}
 
-			// copy fields
-			for (Field field : fields) {
-				newPoint.getValue(field).setFloat(recordedPoint.getValue(field).asFloat());
-			}
+
+	private void stopRecording(GoogleApiClient googleApiClient) {
+		LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListenerAdapter);
+	}
+
+
+	private void resetRecording() {
+		isRecording = false;
+		recordedLocations.clear();
+	}
+
+
+	private DataSet recordedLocationsToDataSet() {
+		final DataSet dataSet = DataSet.create(locationDataSource);
+		for (Location location : recordedLocations) {
+			DataPoint newPoint = dataSet.createDataPoint();
+			newPoint.setTimestamp(location.getTime(), TimeUnit.MILLISECONDS);
+			newPoint.getValue(Field.FIELD_LATITUDE).setFloat((float) location.getLatitude());
+			newPoint.getValue(Field.FIELD_LONGITUDE).setFloat((float) location.getLongitude());
+			newPoint.getValue(Field.FIELD_ALTITUDE).setFloat((float) location.getAltitude());
+			newPoint.getValue(Field.FIELD_ACCURACY).setFloat(location.getAccuracy());
 			dataSet.add(newPoint);
 		}
 		return dataSet;
@@ -256,35 +203,23 @@ public class RecordingManager {
 	}
 
 
-	private class SensorListener implements OnDataPointListener {
+	private class LocationListenerAdapter implements LocationListener {
 
-		private DataListener dataListener = null;
+		private RecordingListener recordingListener = null;
 
 		@Override
-		public void onDataPoint(final DataPoint dataPoint) {
-			if (dataPoint.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
-				// location data
-				locationData.add(dataPoint);
-				if (dataListener != null) dataListener.onLocationChanged(locationData);
-
-			} else if (dataPoint.getDataType().equals(DataType.TYPE_DISTANCE_DELTA)) {
-				// distance data
-				distanceData.add(dataPoint);
-				if (dataListener != null) dataListener.onDistanceChanged(distanceData);
-
-			} else {
-				// unknown
-				Timber.w("unexpected data point with type " + dataPoint.getDataType().getName());
-			}
+		public void onLocationChanged(Location location) {
+			recordedLocations.add(location);
+			Timber.d("location changed (" + recordedLocations.size() + " items)");
+			if (recordingListener != null) recordingListener.onLocationChanged(recordedLocations);
 		}
 
 	}
 
 
-	public interface DataListener {
+	public interface RecordingListener {
 
-		void onLocationChanged(List<DataPoint> locationData);
-		void onDistanceChanged(List<DataPoint> distanceData);
+		void onLocationChanged(List<Location> recordedLocations);
 
 	}
 

@@ -10,6 +10,7 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
+import com.google.android.gms.location.LocationServices;
 
 import roboguice.service.RoboService;
 import timber.log.Timber;
@@ -31,6 +32,7 @@ public class GoogleApiClientService extends RoboService {
 				.addApi(Fitness.SESSIONS_API)
 				.addApi(Fitness.HISTORY_API)
 				.addApi(Fitness.RECORDING_API)
+				.addApi(LocationServices.API)
 				.addScope(new Scope(Scopes.FITNESS_LOCATION_READ_WRITE))
 				.addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ_WRITE))
 				.addConnectionCallbacks(connectionListenerAdapter)
@@ -63,6 +65,7 @@ public class GoogleApiClientService extends RoboService {
 
 	@Override
 	public void onDestroy() {
+		Timber.i("Disconnecting Google API client");
 		if (googleApiClient.isConnected()) googleApiClient.disconnect();
 		super.onDestroy();
 	}

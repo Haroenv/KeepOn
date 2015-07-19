@@ -1,6 +1,7 @@
 package org.faudroids.keepgoing.ui;
 
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -12,7 +13,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.faudroids.keepgoing.R;
-import org.faudroids.keepgoing.sessions.Location;
 
 import java.util.List;
 
@@ -91,7 +91,7 @@ abstract class AbstractMapActivity extends AbstractActivity implements OnMapRead
 		LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
 
 		for (Location location : locationList) {
-			LatLng latLng = new LatLng(location.getLat(), location.getLng());
+			LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 			polylineOptions.add(latLng);
 			boundsBuilder.include(latLng);
 		}

@@ -1,6 +1,8 @@
 package org.faudroids.keepgoing.sessions;
 
 
+import android.location.Location;
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
@@ -123,7 +125,17 @@ public class SessionManager {
 		for (DataPoint dataPoint : distanceDataSet.getDataPoints()) {
 			float lat = dataPoint.getValue(Field.FIELD_LATITUDE).asFloat();
 			float lng = dataPoint.getValue(Field.FIELD_LONGITUDE).asFloat();
-			locations.add(new Location(lat, lng));
+			long timestamp = dataPoint.getTimestamp(TimeUnit.MILLISECONDS);
+			float accuracy = dataPoint.getValue(Field.FIELD_ACCURACY).asFloat();
+			float altitude = dataPoint.getValue(Field.FIELD_ALTITUDE).asFloat();
+
+			Location location = new Location("");
+			location.setLatitude(lat);
+			location.setLongitude(lng);
+			location.setTime(timestamp);
+			location.setAccuracy(accuracy);
+			location.setAltitude(altitude);
+			locations.add(location);
 		}
 		return locations;
 	}

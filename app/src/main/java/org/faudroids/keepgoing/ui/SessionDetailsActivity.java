@@ -4,7 +4,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.faudroids.keepgoing.DefaultTransformer;
+import org.faudroids.keepgoing.utils.DefaultTransformer;
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.sessions.SessionDetails;
 import org.faudroids.keepgoing.sessions.SessionManager;

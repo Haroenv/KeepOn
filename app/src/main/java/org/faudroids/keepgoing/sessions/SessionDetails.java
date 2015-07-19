@@ -1,6 +1,8 @@
 package org.faudroids.keepgoing.sessions;
 
 
+import android.location.Location;
+
 import com.google.android.gms.fitness.data.Session;
 
 import org.roboguice.shaded.goole.common.base.Objects;

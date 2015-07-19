@@ -1,4 +1,4 @@
-package org.faudroids.keepgoing;
+package org.faudroids.keepgoing.utils;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
