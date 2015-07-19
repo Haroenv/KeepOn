@@ -6,4 +6,6 @@
     <dimen name="card_vertical_margin">5dp</dimen>
     <dimen name="card_vertical_margin_large">20dp</dimen>
     <dimen name="card_icon_size">48dp</dimen>
+
+    <dimen name="map_bounds_padding">15dp</dimen>
 </resources>

@@ -3,10 +3,12 @@ package org.faudroids.keepgoing.ui;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.faudroids.keepgoing.R;
@@ -82,15 +84,24 @@ abstract class AbstractMapActivity extends AbstractActivity implements OnMapRead
 
 
 	protected void drawPolyline(List<Location> locationList) {
-		// add polyline to map
+		// add polyline to map + calculate bounding box
 		googleMap.clear();
+
 		PolylineOptions polylineOptions = new PolylineOptions();
+		LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
 		for (Location location : locationList) {
-			polylineOptions.add(new LatLng(location.getLat(), location.getLng()));
+			LatLng latLng = new LatLng(location.getLat(), location.getLng());
+			polylineOptions.add(latLng);
+			boundsBuilder.include(latLng);
 		}
+
 		googleMap.addPolyline(polylineOptions
 				.width(5)
 				.color(Color.BLUE));
+
+		int padding = (int) getResources().getDimension(R.dimen.map_bounds_padding);
+		googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), padding));
 	}
 
 }
