@@ -43,17 +43,8 @@ public class SessionManager {
 
 
 	public Observable<List<SessionOverview>> loadSessionOverviews(final GoogleApiClient googleApiClient) {
-		// load entries from the last 5 years
-		// TODO dynamically load more?
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		long endTime = cal.getTimeInMillis();
-		cal.add(Calendar.YEAR, -5);
-		long startTime = cal.getTimeInMillis();
-
 		// create read request (only read distance, not location for overview)
-		final SessionReadRequest readRequest = new SessionReadRequest.Builder()
-				.setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
+		final SessionReadRequest readRequest = createReadRequest()
 				.read(DataType.TYPE_DISTANCE_DELTA)
 				.build();
 
@@ -66,17 +57,75 @@ public class SessionManager {
 				List<SessionOverview> sessionsList = new ArrayList<>();
 				for (Session session : readResult.getSessions()) {
 					for (DataSet dataSet : readResult.getDataSet(session)) {
-						float distance = 0;
-						for (DataPoint dataPoint : dataSet.getDataPoints()) {
-							distance += dataPoint.getValue(Field.FIELD_DISTANCE).asFloat();
-						}
-						sessionsList.add(new SessionOverview(session, distance));
+						sessionsList.add(new SessionOverview(session, distanceFromDataSet(dataSet)));
 					}
 				}
 
 				return Observable.just(sessionsList);
 			}
 		});
+	}
+
+
+	public Observable<SessionDetails> loadSessionDetails(final GoogleApiClient googleApiClient, final String sessionId) {
+		// create read request (only read distance, not location for overview)
+		final SessionReadRequest readRequest = createReadRequest()
+				.read(DataType.TYPE_DISTANCE_DELTA)
+				.read(DataType.TYPE_LOCATION_SAMPLE)
+				.setSessionId(sessionId)
+				.build();
+
+		return Observable.defer(new Func0<Observable<SessionDetails>>() {
+			@Override
+			public Observable<SessionDetails> call() {
+				SessionReadResult readResult = Fitness.SessionsApi.readSession(googleApiClient, readRequest).await();
+
+				// parse result
+				for (Session session : readResult.getSessions()) {
+					float distance = distanceFromDataSet(readResult.getDataSet(session, DataType.TYPE_DISTANCE_DELTA).get(0));
+					List<Location> locations = locationsFromDataSet(readResult.getDataSet(session, DataType.TYPE_LOCATION_SAMPLE).get(0));
+					return Observable.just(new SessionDetails(session, distance, locations));
+				}
+
+				throw new IllegalStateException("error finding session " + sessionId);
+			}
+		});
+	}
+
+
+	private SessionReadRequest.Builder createReadRequest() {
+		// load entries from the last 5 years
+		// TODO dynamically load more?
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		long endTime = cal.getTimeInMillis();
+		cal.add(Calendar.YEAR, -5);
+		long startTime = cal.getTimeInMillis();
+
+		// create read request (only read distance, not location for overview)
+		return new SessionReadRequest
+				.Builder()
+				.setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+	}
+
+
+	private float distanceFromDataSet(DataSet distanceDataSet) {
+		float distance = 0;
+		for (DataPoint dataPoint : distanceDataSet.getDataPoints()) {
+			distance += dataPoint.getValue(Field.FIELD_DISTANCE).asFloat();
+		}
+		return distance;
+	}
+
+
+	private List<Location> locationsFromDataSet(DataSet distanceDataSet) {
+		List<Location> locations = new ArrayList<>();
+		for (DataPoint dataPoint : distanceDataSet.getDataPoints()) {
+			float lat = dataPoint.getValue(Field.FIELD_LATITUDE).asFloat();
+			float lng = dataPoint.getValue(Field.FIELD_LONGITUDE).asFloat();
+			locations.add(new Location(lat, lng));
+		}
+		return locations;
 	}
 
 }

@@ -1,5 +1,6 @@
 package org.faudroids.keepgoing.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -93,15 +94,25 @@ public class SessionsOverviewActivity extends AbstractActivity {
 
 	private class SessionViewHolder extends RecyclerView.ViewHolder {
 
+		private final View itemView;
 		private final TextView dateTextView, distanceTextView;
 
-		public SessionViewHolder(View view) {
-			super(view);
-			dateTextView = (TextView) view.findViewById(R.id.txt_time);
-			distanceTextView = (TextView) view.findViewById(R.id.txt_distance);
+		public SessionViewHolder(View itemView) {
+			super(itemView);
+			this.itemView = itemView;
+			this.dateTextView = (TextView) itemView.findViewById(R.id.txt_time);
+			this.distanceTextView = (TextView) itemView.findViewById(R.id.txt_distance);
 		}
 
-		public void setData(SessionOverview overview) {
+		public void setData(final SessionOverview overview) {
+			itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent detailsIntent = new Intent(SessionsOverviewActivity.this, SessionDetailsActivity.class);
+					detailsIntent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, overview.getSession().getIdentifier());
+					startActivity(detailsIntent);
+				}
+			});
 			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(overview.getSession().getStartTime(TimeUnit.MILLISECONDS))));
 			distanceTextView.setText(overview.getTotalDistanceInMeters() + " m");
 		}

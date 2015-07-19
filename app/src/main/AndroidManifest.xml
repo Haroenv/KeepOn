@@ -35,6 +35,9 @@
         <activity
             android:name=".ui.SessionsOverviewActivity"
             />
+        <activity
+            android:name=".ui.SessionDetailsActivity"
+            />
         <service
             android:name=".recording.GoogleApiClientService"
             />

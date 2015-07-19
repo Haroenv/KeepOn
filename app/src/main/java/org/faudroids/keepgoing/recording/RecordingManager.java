@@ -149,9 +149,6 @@ public class RecordingManager {
 									.setActivity(FitnessActivities.RUNNING_JOGGING)
 									.build();
 
-							Timber.d("setting session id to " + session.getIdentifier());
-							lastSessionId = session.getIdentifier();
-
 							// save session
 							resultObservable = sessionManager.createSession(googleApiClient, session, locationDataSet, distanceDataSet);
 

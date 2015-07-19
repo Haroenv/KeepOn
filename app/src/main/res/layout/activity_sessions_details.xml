@@ -1,0 +1,27 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/txt_distance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:text="5 m"
+        android:gravity="center"
+        android:padding="15dp"
+        android:layout_alignParentBottom="true"
+        />
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/txt_distance"
+        />
+
+
+</RelativeLayout>
