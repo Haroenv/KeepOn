@@ -158,6 +158,8 @@ public class RecordingManager {
 							resultObservable = Observable.just(null);
 						}
 
+						resetRecording();
+
 						return resultObservable.flatMap(new Func1<Status, Observable<Status>>() {
 							@Override
 							public Observable<Status> call(Status saveStatus) {
