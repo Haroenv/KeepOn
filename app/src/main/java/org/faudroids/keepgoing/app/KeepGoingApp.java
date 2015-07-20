@@ -3,8 +3,15 @@ package org.faudroids.keepgoing.app;
 import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
+import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.faudroids.keepgoing.BuildConfig;
+import org.faudroids.keepgoing.database.User;
+import org.faudroids.keepgoing.database.User$Table;
+
+import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
@@ -21,6 +28,7 @@ public class KeepGoingApp extends Application{
             Fabric.with(this, new Crashlytics());
             Timber.plant(new CrashReportingTree());
         }
+		FlowManager.init(this);
     }
 
 	private static final class CrashReportingTree extends Timber.Tree {
