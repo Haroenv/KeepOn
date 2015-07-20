@@ -18,6 +18,7 @@ import timber.log.Timber;
 
 public abstract class AbstractGoogleClientApiService extends RoboService implements ServiceConnection {
 
+	private final GoogleApiClientService.CombinedConnectionListener apiConnectionListener = new GoogleApiClientConnectionListener();
 	private GoogleApiClientService apiClientService = null;
 
 	@Override
@@ -33,7 +34,7 @@ public abstract class AbstractGoogleClientApiService extends RoboService impleme
 	@Override
 	public void onDestroy() {
 		unbindService(this);
-		if (apiClientService != null) apiClientService.unregisterConnectionListener();
+		if (apiClientService != null) apiClientService.unregisterConnectionListener(apiConnectionListener);
 		super.onDestroy();
 	}
 
@@ -46,17 +47,7 @@ public abstract class AbstractGoogleClientApiService extends RoboService impleme
 		if (isGoogleApiClientConnected()) onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
 
 		// start listening for api connection
-		apiClientService.registerConnectionListener(new GoogleApiClientService.CombinedConnectionListener() {
-			@Override
-			public void onConnected() {
-				onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
-			}
-
-			@Override
-			public void onConnectionFailed(ConnectionResult connectionResult) {
-				onGoogleAliClientConnectionFailed(connectionResult);
-			}
-		});
+		apiClientService.registerConnectionListener(apiConnectionListener);
 	}
 
 	@Override
@@ -81,6 +72,21 @@ public abstract class AbstractGoogleClientApiService extends RoboService impleme
 
 	protected void onGoogleAliClientConnectionFailed(ConnectionResult connectionResult) {
 		// nothing to do for now
+	}
+
+
+	private class GoogleApiClientConnectionListener implements GoogleApiClientService.CombinedConnectionListener {
+
+		@Override
+		public void onConnected() {
+			onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
+		}
+
+		@Override
+		public void onConnectionFailed(ConnectionResult connectionResult) {
+			onGoogleAliClientConnectionFailed(connectionResult);
+		}
+
 	}
 
 }

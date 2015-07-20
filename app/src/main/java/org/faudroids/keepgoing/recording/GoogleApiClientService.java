@@ -11,6 +11,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.plus.Plus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import roboguice.service.RoboService;
 import timber.log.Timber;
@@ -28,11 +32,14 @@ public class GoogleApiClientService extends RoboService {
 	public void onCreate() {
 		super.onCreate();
 		googleApiClient = new GoogleApiClient.Builder(this)
+				.addApi(Plus.API)
 				.addApi(Fitness.SENSORS_API)
 				.addApi(Fitness.SESSIONS_API)
 				.addApi(Fitness.HISTORY_API)
 				.addApi(Fitness.RECORDING_API)
 				.addApi(LocationServices.API)
+				.addScope(new Scope(Scopes.PLUS_ME))
+				.addScope(new Scope(Scopes.PLUS_ME))
 				.addScope(new Scope(Scopes.FITNESS_LOCATION_READ_WRITE))
 				.addScope(new Scope(Scopes.FITNESS_ACTIVITY_READ_WRITE))
 				.addConnectionCallbacks(connectionListenerAdapter)
@@ -46,13 +53,13 @@ public class GoogleApiClientService extends RoboService {
 	}
 
 
-	public void registerConnectionListener(CombinedConnectionListener combinedConnectionListener) {
-		connectionListenerAdapter.registerConnectionListener(combinedConnectionListener);
+	public void registerConnectionListener(CombinedConnectionListener listener) {
+		connectionListenerAdapter.registerConnectionListener(listener);
 	}
 
 
-	public void unregisterConnectionListener() {
-		connectionListenerAdapter.unregisterConnectionListener();
+	public void unregisterConnectionListener(CombinedConnectionListener listener) {
+		connectionListenerAdapter.unregisterConnectionListener(listener);
 	}
 
 
@@ -88,7 +95,7 @@ public class GoogleApiClientService extends RoboService {
 
 		private static final int NO_CAUSE = -1;
 
-		private CombinedConnectionListener combinedConnectionListener = null;
+		private final List<CombinedConnectionListener> listenerList = new ArrayList<>();
 
 		private ConnectionResult errorConnectionResult = null;
 		private boolean isConnected = false;
@@ -96,23 +103,25 @@ public class GoogleApiClientService extends RoboService {
 		@Override
 		public void onConnectionFailed(ConnectionResult connectionResult) {
 			Timber.w("Google API connection failed");
-			if (combinedConnectionListener == null) {
-				errorConnectionResult = connectionResult;
-				isConnected = false;
-			} else {
-				combinedConnectionListener.onConnectionFailed(connectionResult);
-			}
+
+			// mark connection error
+			errorConnectionResult = connectionResult;
+			isConnected = false;
+
+			// notify listener
+			for (CombinedConnectionListener listener : listenerList) listener.onConnectionFailed(connectionResult);
 		}
 
 		@Override
 		public void onConnected(Bundle bundle) {
 			Timber.i("Google API connection success");
-			if (combinedConnectionListener == null) {
-				isConnected = true;
-				errorConnectionResult = null;
-			} else {
-				combinedConnectionListener.onConnected();
-			}
+
+			// mark connection successful
+			isConnected = true;
+			errorConnectionResult = null;
+
+			// notify listeners
+			for (CombinedConnectionListener listener : listenerList) listener.onConnected();
 		}
 
 		@Override
@@ -129,14 +138,14 @@ public class GoogleApiClientService extends RoboService {
 			 */
 		}
 
-		public void registerConnectionListener(CombinedConnectionListener combinedConnectionListener) {
-			this.combinedConnectionListener = combinedConnectionListener;
-			if (isConnected) combinedConnectionListener.onConnected();
-			else if (errorConnectionResult != null) combinedConnectionListener.onConnectionFailed(errorConnectionResult);
+		public void registerConnectionListener(CombinedConnectionListener listener) {
+			listenerList.add(listener);
+			if (isConnected) listener.onConnected();
+			else if (errorConnectionResult != null) listener.onConnectionFailed(errorConnectionResult);
 		}
 
-		public void unregisterConnectionListener() {
-			this.combinedConnectionListener = null;
+		public void unregisterConnectionListener(CombinedConnectionListener listener) {
+			listenerList.remove(listener);
 		}
 
 	}

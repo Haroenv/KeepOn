@@ -3,23 +3,64 @@ package org.faudroids.keepgoing.ui;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.faudroids.keepgoing.R;
+
+import roboguice.inject.ContentView;
+import roboguice.inject.InjectView;
 import timber.log.Timber;
 
 
 /**
  * Handles the Google API initial connection
  */
+@ContentView(R.layout.activity_login)
 public class LoginActivity extends AbstractActivity {
 
 	private static final int REQUEST_OAUTH = 42;
 
-	private static final String STATE_AUTH_PENDING = "STATE_AUTH_PENDING";
+	private static final String
+			STATE_AUTH_PENDING = "STATE_AUTH_PENDING",
+			STATE_SIGN_IN_SUCCESSFUL = "STATE_SIGN_IN_SUCCESSFUL",
+			STATE_SIGN_IN_CLICKED = "STATE_SIGN_IN_CLICKED",
+			STATE_SIGN_IN_CONNECTION_RESULT= "STATE_SIGN_IN_CONNECTION_RESULT";
+
+	@InjectView(R.id.btn_sign_in) private SignInButton signInButton;
 	private boolean authInProgress = false;
+	private boolean signInSuccessful = false;
+	private boolean signInClicked = false;
+	private ConnectionResult signInConnectionResult = null;
+
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		// setup sign in button
+		signInButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				signInClicked = true;
+				if (signInSuccessful) startMainActivity();
+				else if (signInConnectionResult != null) resolveSignInError();
+				// else do nothing and wait for callbacks
+			}
+		});
+
+		// restore state
+		if (savedInstanceState != null) {
+			authInProgress = savedInstanceState.getBoolean(STATE_AUTH_PENDING);
+			signInSuccessful = savedInstanceState.getBoolean(STATE_SIGN_IN_SUCCESSFUL);
+			signInClicked = savedInstanceState.getBoolean(STATE_SIGN_IN_CLICKED);
+			signInConnectionResult = savedInstanceState.getParcelable(STATE_SIGN_IN_CONNECTION_RESULT);
+		}
+	}
 
 
 	@Override
@@ -43,22 +84,36 @@ public class LoginActivity extends AbstractActivity {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean(STATE_AUTH_PENDING, authInProgress);
+		outState.putBoolean(STATE_SIGN_IN_CLICKED, signInClicked);
+		outState.putBoolean(STATE_SIGN_IN_SUCCESSFUL, signInSuccessful);
+		outState.putParcelable(STATE_SIGN_IN_CONNECTION_RESULT, signInConnectionResult);
 	}
 
 
 	@Override
 	protected void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
-		// if connected start actual application
-		startActivity(new Intent(LoginActivity.this, MainActivity.class));
+		signInSuccessful = true;
+		if (signInClicked) startMainActivity();
 	}
 
 
 	@Override
 	protected void onGoogleAliClientConnectionFailed(ConnectionResult connectionResult) {
-		// on connection error try resolving problem
-		if (!connectionResult.hasResolution()) {
+		signInConnectionResult = connectionResult;
+		if (signInClicked) resolveSignInError();
+	}
+
+
+	private void startMainActivity() {
+		startActivity(new Intent(LoginActivity.this, MainActivity.class));
+		finish();
+	}
+
+
+	private void resolveSignInError() {
+		if (!signInConnectionResult.hasResolution()) {
 			Timber.w("no resolution found");
-			GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), LoginActivity.this, 0).show();
+			GooglePlayServicesUtil.getErrorDialog(signInConnectionResult.getErrorCode(), LoginActivity.this, 0).show();
 			return;
 		}
 
@@ -66,7 +121,7 @@ public class LoginActivity extends AbstractActivity {
 			try {
 				Timber.w("attempting to resolve failed connection");
 				authInProgress = true;
-				connectionResult.startResolutionForResult(LoginActivity.this, REQUEST_OAUTH);
+				signInConnectionResult.startResolutionForResult(LoginActivity.this, REQUEST_OAUTH);
 			} catch (IntentSender.SendIntentException e) {
 				Timber.e(e, "failed to send resolution intent");
 			}
