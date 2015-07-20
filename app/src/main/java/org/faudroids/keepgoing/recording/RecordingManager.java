@@ -96,11 +96,11 @@ public class RecordingManager {
 	}
 
 
-	public Observable<Status> stopAndSaveRecording(final GoogleApiClient googleApiClient) {
+	public Observable<RecordingResult> stopAndSaveRecording(final GoogleApiClient googleApiClient) {
 		Timber.d("storing " + recordedLocations.size() + " locations");
-		return Observable.defer(new Func0<Observable<Status>>() {
+		return Observable.defer(new Func0<Observable<RecordingResult>>() {
 			@Override
-			public Observable<Status> call() {
+			public Observable<RecordingResult> call() {
 				// create location data
 				DataSet locationDataSet = recordedLocationsToDataSet();
 
@@ -128,7 +128,15 @@ public class RecordingManager {
 				}
 
 				stopAndDiscardRecording(googleApiClient);
-				return resultObservable;
+				return resultObservable.flatMap(new Func1<Status, Observable<RecordingResult>>() {
+					@Override
+					public Observable<RecordingResult> call(Status saveStatus) {
+						RecordingResult recordingResult;
+						if (saveStatus == null) recordingResult = new RecordingResult(true, null);
+						else recordingResult = new RecordingResult(false, saveStatus);
+						return Observable.just(recordingResult);
+					}
+				});
 			}
 		});
 	}

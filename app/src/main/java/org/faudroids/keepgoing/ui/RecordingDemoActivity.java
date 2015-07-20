@@ -8,12 +8,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.recording.RecordingManager;
+import org.faudroids.keepgoing.recording.RecordingResult;
 import org.faudroids.keepgoing.utils.DefaultTransformer;
 
 import java.util.Iterator;
@@ -74,11 +74,12 @@ public class RecordingDemoActivity extends AbstractMapActivity {
 					// stop recording
 					recordingManager
 							.stopAndSaveRecording(googleApiClient)
-							.compose(new DefaultTransformer<Status>())
-							.subscribe(new Action1<Status>() {
+							.compose(new DefaultTransformer<RecordingResult>())
+							.subscribe(new Action1<RecordingResult>() {
 								@Override
-								public void call(Status status) {
-									Toast.makeText(RecordingDemoActivity.this, "Recording stopped successfully: " + (status.isSuccess()), Toast.LENGTH_SHORT).show();
+								public void call(RecordingResult recordingResult) {
+									if (recordingResult.isRecordingDiscarded()) Toast.makeText(RecordingDemoActivity.this, "Discarded empty recording", Toast.LENGTH_SHORT).show();
+									else Toast.makeText(RecordingDemoActivity.this, "Recording stopped successfully: " + recordingResult.getSaveRecordingStatus().isSuccess(), Toast.LENGTH_SHORT).show();
 									toggleRecordingButtonText();
 								}
 							});
