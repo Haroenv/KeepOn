@@ -11,6 +11,9 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.faudroids.keepgoing.R;
+import org.faudroids.keepgoing.auth.AuthManager;
+
+import javax.inject.Inject;
 
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
@@ -37,6 +40,7 @@ public class LoginActivity extends AbstractActivity {
 	private boolean signInClicked = false;
 	private ConnectionResult signInConnectionResult = null;
 
+	@Inject private AuthManager authManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,7 @@ public class LoginActivity extends AbstractActivity {
 
 
 	private void startMainActivity() {
+		authManager.signIn(getGoogleApiClient());
 		startActivity(new Intent(LoginActivity.this, MainActivity.class));
 		finish();
 	}

@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.android.gms.plus.Plus;
-
 import org.faudroids.keepgoing.R;
+import org.faudroids.keepgoing.auth.AuthManager;
+
+import javax.inject.Inject;
 
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import timber.log.Timber;
 
 
 @ContentView(R.layout.activity_main)
@@ -21,6 +23,8 @@ public class MainActivity extends AbstractActivity {
 	@InjectView(R.id.btn_recording_demo) private Button recordingDemoButton;
 	@InjectView(R.id.btn_show_sessions) private Button showSessionsButton;
 	@InjectView(R.id.btn_logout) private Button logoutButton;
+
+	@Inject private AuthManager authManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,13 +64,13 @@ public class MainActivity extends AbstractActivity {
 				if (!assertIsGoogleApiClientConnected()) return;
 
 				// logout
-				Plus.AccountApi.clearDefaultAccount(getGoogleApiClient());
-				getGoogleApiClient().disconnect();
-				getGoogleApiClient().connect();
+				authManager.signOut(getGoogleApiClient());
 				finish();
 				startActivity(new Intent(MainActivity.this, LoginActivity.class));
 			}
 		});
+
+		Timber.d("logged in with name " + authManager.getAccount().getName());
 	}
 
 }
