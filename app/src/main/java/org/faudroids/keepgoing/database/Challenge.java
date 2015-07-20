@@ -58,8 +58,8 @@ public class Challenge extends BaseModel {
         this.challengeDescription = description;
     }
 
-    private List<User> currentChallengers;
-    private List<Record> challengeRecords;
+    List<User> currentChallengers;
+    List<Record> challengeRecords;
 
     //Returns a list of all users currently working on this challenge
     @OneToMany(methods = OneToMany.Method.ALL, variableName = "currentChallengers")
