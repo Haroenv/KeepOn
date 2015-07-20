@@ -142,6 +142,7 @@ public class RecordingManager {
 
 	private void stopRecording(GoogleApiClient googleApiClient) {
 		LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationListenerAdapter);
+		context.stopService(new Intent(context, RecordingService.class));
 	}
 
 
