@@ -4,8 +4,8 @@ import android.content.SharedPreferences;
 
 public class StringPreference extends AbstractPreference<String> {
 
-	public StringPreference(SharedPreferences preferences, String key) {
-		super(preferences, key);
+	public StringPreference(SharedPreferences preferences, String key, String defaultValue) {
+		super(preferences, key, defaultValue);
 	}
 
 
@@ -14,7 +14,8 @@ public class StringPreference extends AbstractPreference<String> {
 		editor.putString(key, value);
 	}
 
-	public String get() {
+	@Override
+	protected String doGet() {
 		return preferences.getString(key, null);
 	}
 

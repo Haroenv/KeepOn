@@ -4,16 +4,12 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.sql.builder.Condition;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.faudroids.keepgoing.BuildConfig;
-import org.faudroids.keepgoing.database.User;
-import org.faudroids.keepgoing.database.User$Table;
-
-import java.util.List;
+import org.faudroids.keepgoing.database.DatabaseModule;
 
 import io.fabric.sdk.android.Fabric;
+import roboguice.RoboGuice;
 import timber.log.Timber;
 
 public class KeepGoingApp extends Application{
@@ -22,13 +18,23 @@ public class KeepGoingApp extends Application{
     public void onCreate() {
         super.onCreate();
 
+		// setup DI
+		RoboGuice.getOrCreateBaseApplicationInjector(
+				this,
+				RoboGuice.DEFAULT_STAGE,
+				RoboGuice.newDefaultRoboModule(this),
+				new DatabaseModule());
+
+		// setup DB
+		FlowManager.init(this);
+
+		// setup logging
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
             Fabric.with(this, new Crashlytics());
             Timber.plant(new CrashReportingTree());
         }
-		FlowManager.init(this);
     }
 
 	private static final class CrashReportingTree extends Timber.Tree {

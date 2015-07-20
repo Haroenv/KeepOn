@@ -21,9 +21,9 @@ public class AuthManager {
 
 	@Inject
 	AuthManager(PreferenceFactory preferenceFactory) {
-		this.namePref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_NAME);
-		this.emailPref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_EMAIL);
-		this.imageUrlPref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_IMAGE_URL);
+		this.namePref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_NAME, null);
+		this.emailPref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_EMAIL, null);
+		this.imageUrlPref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_IMAGE_URL, null);
 	}
 
 

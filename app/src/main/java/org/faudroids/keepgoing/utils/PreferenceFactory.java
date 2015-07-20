@@ -1,6 +1,7 @@
 package org.faudroids.keepgoing.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import javax.inject.Inject;
 
@@ -16,8 +17,16 @@ public class PreferenceFactory {
 		this.context = context;
 	}
 
-	public StringPreference newStringPreference(String prefName, String key) {
-		return new StringPreference(context.getSharedPreferences(prefName, Context.MODE_PRIVATE), key);
+	public StringPreference newStringPreference(String prefName, String key, String defaultValue) {
+		return new StringPreference(getSharedPrefs(prefName), key, defaultValue);
+	}
+
+	public BooleanPreference newBooleanPreference(String prefsName, String key, boolean defaultValue) {
+		return new BooleanPreference(getSharedPrefs(prefsName), key, defaultValue);
+	}
+
+	private SharedPreferences getSharedPrefs(String prefsName) {
+		return context.getSharedPreferences(prefsName, Context.MODE_PRIVATE);
 	}
 
 }
