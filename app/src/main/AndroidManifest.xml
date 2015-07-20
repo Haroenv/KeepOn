@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -26,7 +25,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.MainDrawerActivity"
+            android:theme="@style/DrawerTheme"
             />
         <activity
             android:name=".ui.GoogleFitDemoActivity"
@@ -44,7 +44,7 @@
             android:name=".ui.SessionDetailsActivity"
             />
         <service
-            android:name=".recording.GoogleApiClientService"
+            android:name=".googleapi.GoogleApiClientService"
             />
         <service
             android:name=".recording.RecordingService"
@@ -65,5 +65,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="d24b6175dc50a0705e30d49f9f580ca61cbddbed" />
+
     </application>
 </manifest>

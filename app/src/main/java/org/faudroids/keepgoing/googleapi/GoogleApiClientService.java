@@ -1,4 +1,4 @@
-package org.faudroids.keepgoing.recording;
+package org.faudroids.keepgoing.googleapi;
 
 import android.content.Intent;
 import android.os.Binder;
@@ -52,12 +52,12 @@ public class GoogleApiClientService extends RoboService {
 	}
 
 
-	public void registerConnectionListener(CombinedConnectionListener listener) {
+	public void registerConnectionListener(GoogleApiClientListener listener) {
 		connectionListenerAdapter.registerConnectionListener(listener);
 	}
 
 
-	public void unregisterConnectionListener(CombinedConnectionListener listener) {
+	public void unregisterConnectionListener(GoogleApiClientListener listener) {
 		connectionListenerAdapter.unregisterConnectionListener(listener);
 	}
 
@@ -94,7 +94,7 @@ public class GoogleApiClientService extends RoboService {
 
 		private static final int NO_CAUSE = -1;
 
-		private final List<CombinedConnectionListener> listenerList = new ArrayList<>();
+		private final List<GoogleApiClientListener> listenerList = new ArrayList<>();
 
 		private ConnectionResult errorConnectionResult = null;
 		private boolean isConnected = false;
@@ -108,7 +108,7 @@ public class GoogleApiClientService extends RoboService {
 			isConnected = false;
 
 			// notify listener
-			for (CombinedConnectionListener listener : listenerList) listener.onConnectionFailed(connectionResult);
+			for (GoogleApiClientListener listener : listenerList) listener.onGoogleAliClientConnectionFailed(connectionResult);
 		}
 
 		@Override
@@ -120,7 +120,7 @@ public class GoogleApiClientService extends RoboService {
 			errorConnectionResult = null;
 
 			// notify listeners
-			for (CombinedConnectionListener listener : listenerList) listener.onConnected();
+			for (GoogleApiClientListener listener : listenerList) listener.onGoogleApiClientConnected(googleApiClient);
 		}
 
 		@Override
@@ -137,23 +137,15 @@ public class GoogleApiClientService extends RoboService {
 			 */
 		}
 
-		public void registerConnectionListener(CombinedConnectionListener listener) {
+		public void registerConnectionListener(GoogleApiClientListener listener) {
 			listenerList.add(listener);
-			if (isConnected) listener.onConnected();
-			else if (errorConnectionResult != null) listener.onConnectionFailed(errorConnectionResult);
+			if (isConnected) listener.onGoogleApiClientConnected(googleApiClient);
+			else if (errorConnectionResult != null) listener.onGoogleAliClientConnectionFailed(errorConnectionResult);
 		}
 
-		public void unregisterConnectionListener(CombinedConnectionListener listener) {
+		public void unregisterConnectionListener(GoogleApiClientListener listener) {
 			listenerList.remove(listener);
 		}
-
-	}
-
-
-	public interface CombinedConnectionListener {
-
-		void onConnected();
-		void onConnectionFailed(ConnectionResult connectionResult);
 
 	}
 

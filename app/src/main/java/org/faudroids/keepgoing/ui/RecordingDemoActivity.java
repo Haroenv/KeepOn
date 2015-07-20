@@ -53,7 +53,9 @@ public class RecordingDemoActivity extends AbstractMapActivity {
 
 
 	@Override
-	protected void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
+	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
+		super.onGoogleApiClientConnected(googleApiClient);
+
 		// restore button state
 		toggleRecordingButtonText();
 

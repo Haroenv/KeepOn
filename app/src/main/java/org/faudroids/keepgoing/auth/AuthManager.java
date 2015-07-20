@@ -14,13 +14,15 @@ public class AuthManager {
 	private static final String PREFS_NAME = "org.faudroids.keepgoing.AuthManager";
 	private static final String
 			KEY_NAME = "KEY_NAME",
-			KEY_IMAGE_URL = "KEY_IMAGE_URL";
+			KEY_IMAGE_URL = "KEY_IMAGE_URL",
+			KEY_EMAIL = "KEY_EMAIL";
 
-	private final StringPreference namePref, imageUrlPref;
+	private final StringPreference namePref, emailPref, imageUrlPref;
 
 	@Inject
 	AuthManager(PreferenceFactory preferenceFactory) {
 		this.namePref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_NAME);
+		this.emailPref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_EMAIL);
 		this.imageUrlPref = preferenceFactory.newStringPreference(PREFS_NAME, KEY_IMAGE_URL);
 	}
 
@@ -29,6 +31,9 @@ public class AuthManager {
 		Person person = Plus.PeopleApi.getCurrentPerson(googleApiClient);
 		namePref.set(person.getDisplayName());
 		imageUrlPref.set(person.getImage().getUrl());
+
+		String email = Plus.AccountApi.getAccountName(googleApiClient);
+		emailPref.set(email);
 	}
 
 	public void signOut(GoogleApiClient googleApiClient) {
@@ -42,7 +47,7 @@ public class AuthManager {
 	}
 
 	public Account getAccount() {
-		return new Account(namePref.get(), imageUrlPref.get());
+		return new Account(namePref.get(), emailPref.get(), imageUrlPref.get());
 	}
 
 }

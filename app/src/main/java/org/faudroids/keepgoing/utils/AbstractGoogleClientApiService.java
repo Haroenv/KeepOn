@@ -10,15 +10,14 @@ import android.os.IBinder;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.faudroids.keepgoing.recording.GoogleApiClientService;
-import org.roboguice.shaded.goole.common.base.Optional;
+import org.faudroids.keepgoing.googleapi.GoogleApiClientListener;
+import org.faudroids.keepgoing.googleapi.GoogleApiClientService;
 
 import roboguice.service.RoboService;
 import timber.log.Timber;
 
-public abstract class AbstractGoogleClientApiService extends RoboService implements ServiceConnection {
+public abstract class AbstractGoogleClientApiService extends RoboService implements ServiceConnection, GoogleApiClientListener {
 
-	private final GoogleApiClientService.CombinedConnectionListener apiConnectionListener = new GoogleApiClientConnectionListener();
 	private GoogleApiClientService apiClientService = null;
 
 	@Override
@@ -31,12 +30,14 @@ public abstract class AbstractGoogleClientApiService extends RoboService impleme
 
 	protected abstract int doOnStartCommand(Intent intent, int flags, int startId);
 
+
 	@Override
 	public void onDestroy() {
 		unbindService(this);
-		if (apiClientService != null) apiClientService.unregisterConnectionListener(apiConnectionListener);
+		if (apiClientService != null) apiClientService.unregisterConnectionListener(this);
 		super.onDestroy();
 	}
+
 
 	@Override
 	public final void onServiceConnected(ComponentName name, IBinder binder) {
@@ -47,7 +48,7 @@ public abstract class AbstractGoogleClientApiService extends RoboService impleme
 		if (isGoogleApiClientConnected()) onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
 
 		// start listening for api connection
-		apiClientService.registerConnectionListener(apiConnectionListener);
+		apiClientService.registerConnectionListener(this);
 	}
 
 	@Override
@@ -55,38 +56,21 @@ public abstract class AbstractGoogleClientApiService extends RoboService impleme
 		apiClientService = null;
 	}
 
-	protected Optional<GoogleApiClientService> getGoogleApiClientService() {
-		return Optional.fromNullable(apiClientService);
-	}
 
 	private boolean isGoogleApiClientConnected() {
 		return apiClientService != null && apiClientService.getGoogleApiClient().isConnected();
 	}
 
-	/**
-	 * Called when the {@link GoogleApiClientService} is bound to this activity.
-	 */
-	protected void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
-		// override when required
-	}
 
-	protected void onGoogleAliClientConnectionFailed(ConnectionResult connectionResult) {
-		// nothing to do for now
+	@Override
+	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+		// empty default implementation
 	}
 
 
-	private class GoogleApiClientConnectionListener implements GoogleApiClientService.CombinedConnectionListener {
-
-		@Override
-		public void onConnected() {
-			onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
-		}
-
-		@Override
-		public void onConnectionFailed(ConnectionResult connectionResult) {
-			onGoogleAliClientConnectionFailed(connectionResult);
-		}
-
+	@Override
+	public void onGoogleAliClientConnectionFailed(ConnectionResult connectionResult) {
+		// empty default implementation
 	}
 
 }

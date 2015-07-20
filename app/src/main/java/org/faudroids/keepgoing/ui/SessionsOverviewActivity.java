@@ -49,7 +49,8 @@ public class SessionsOverviewActivity extends AbstractActivity {
 
 
 	@Override
-	protected void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+		super.onGoogleApiClientConnected(googleApiClient);
 		sessionManager.loadSessionOverviews(googleApiClient)
 				.compose(new DefaultTransformer<List<SessionOverview>>())
 				.subscribe(new Action1<List<SessionOverview>>() {

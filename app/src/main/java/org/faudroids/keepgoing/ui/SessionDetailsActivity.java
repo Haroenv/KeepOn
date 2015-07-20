@@ -30,7 +30,8 @@ public class SessionDetailsActivity extends AbstractMapActivity {
 
 
 	@Override
-	protected void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+		super.onGoogleApiClientConnected(googleApiClient);
 		String sessionId = getIntent().getStringExtra(EXTRA_SESSION_ID);
 		Timber.i("loading session with id " + sessionId);
 

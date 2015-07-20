@@ -10,13 +10,10 @@ import org.faudroids.keepgoing.auth.AuthManager;
 
 import javax.inject.Inject;
 
-import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
-import timber.log.Timber;
 
 
-@ContentView(R.layout.activity_main)
-public class MainActivity extends AbstractActivity {
+public class MainFragment extends AbstractFragment {
 
 	@InjectView(R.id.btn_fit_demo) private Button fitDemoButton;
 	@InjectView(R.id.btn_map_demo) private Button mapDemoButton;
@@ -26,51 +23,56 @@ public class MainActivity extends AbstractActivity {
 
 	@Inject private AuthManager authManager;
 
+
+	public MainFragment() {
+		super(R.layout.fragment_main);
+	}
+
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 
 		fitDemoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, GoogleFitDemoActivity.class));
+				startActivity(new Intent(getActivity(), GoogleFitDemoActivity.class));
 			}
 		});
 
 		mapDemoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, MapsActivity.class));
+				startActivity(new Intent(getActivity(), MapsActivity.class));
 			}
 		});
 
 		recordingDemoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, RecordingDemoActivity.class));
+				startActivity(new Intent(getActivity(), RecordingDemoActivity.class));
 			}
 		});
 
 		showSessionsButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, SessionsOverviewActivity.class));
+				startActivity(new Intent(getActivity(), SessionsOverviewActivity.class));
 			}
 		});
 
 		logoutButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (!assertIsGoogleApiClientConnected()) return;
+				if (!googleApiClientObserver.assertIsGoogleApiClientConnected()) return;
 
 				// logout
-				authManager.signOut(getGoogleApiClient());
-				finish();
-				startActivity(new Intent(MainActivity.this, LoginActivity.class));
+				authManager.signOut(googleApiClientObserver.getGoogleApiClient());
+				getActivity().finish();
+				startActivity(new Intent(getActivity(), LoginActivity.class));
 			}
 		});
 
-		Timber.d("logged in with name " + authManager.getAccount().getName());
 	}
 
 }

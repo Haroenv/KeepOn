@@ -5,4 +5,12 @@
 
     <string name="start_recording">Start recording</string>
     <string name="stop_recording">Stop recording</string>
+
+    <string name="section_demo">Demo</string>
+
+    <string name="feedback">Feedback</string>
+    <string name="feedback_mail_chooser">Thanks for the feedback!</string>
+    <string name="feedback_mail_address"> ideas@faudroids.org</string>
+    <string name="feedback_mail_subject">Feedback TODO</string>
+
 </resources>

@@ -95,14 +95,16 @@ public class LoginActivity extends AbstractActivity {
 
 
 	@Override
-	protected void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+		super.onGoogleApiClientConnected(googleApiClient);
 		signInSuccessful = true;
 		if (signInClicked) startMainActivity();
 	}
 
 
 	@Override
-	protected void onGoogleAliClientConnectionFailed(ConnectionResult connectionResult) {
+	public void onGoogleAliClientConnectionFailed(ConnectionResult connectionResult) {
+		super.onGoogleAliClientConnectionFailed(connectionResult);
 		signInConnectionResult = connectionResult;
 		if (signInClicked) resolveSignInError();
 	}
@@ -110,7 +112,7 @@ public class LoginActivity extends AbstractActivity {
 
 	private void startMainActivity() {
 		authManager.signIn(getGoogleApiClient());
-		startActivity(new Intent(LoginActivity.this, MainActivity.class));
+		startActivity(new Intent(LoginActivity.this, MainDrawerActivity.class));
 		finish();
 	}
 

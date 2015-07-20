@@ -1,8 +1,28 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/blue</item>
+    </style>
+
+    <style name="DrawerTheme" parent="MaterialNavigationDrawerTheme.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/blue</item>
+        <item name="sectionStyle">@style/SectionTheme</item>
+        <item name="singleAccount">true</item>
+        <item name="learningPattern">false</item>
+        <item name="drawerColor">@color/gray_dark</item>
+    </style>
+
+    <style name="SectionTheme">
+        <item name="sectionColorIcon">@android:color/white</item>
+        <item name="sectionColorText">@android:color/white</item>
+        <item name="sectionBackgroundColorPressed">@color/gray</item>
+        <item name="sectionBackgroundColorSelected">@color/gray_2</item>
     </style>
 
 </resources>
