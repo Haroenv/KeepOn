@@ -1,0 +1,123 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:id="@+id/container_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:background="@android:color/white"
+        >
+
+        <TextView
+            android:id="@+id/txt_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00:00"
+            android:textColor="@color/green"
+            android:textSize="50sp"
+            android:layout_centerHorizontal="true"
+            />
+
+        <TextView
+            android:id="@+id/txt_duration_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/duration"
+            android:textAllCaps="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="10sp"
+            android:layout_below="@id/txt_duration"
+            style="@style/FontSecondary"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_duration_description"
+            android:layout_alignParentLeft="true"
+            android:orientation="vertical"
+            android:layout_marginLeft="15dp"
+            >
+
+            <TextView
+                android:id="@+id/txt_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txt_duration"
+                android:layout_gravity="center"
+                android:text="0.00"
+                android:textAllCaps="true"
+                android:textSize="36sp"
+                style="@style/FontDefault"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/distance_in_km"
+                android:textAllCaps="true"
+                android:textSize="10sp"
+                style="@style/FontSecondary"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_duration_description"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical"
+            android:layout_marginRight="15dp"
+            >
+
+            <TextView
+                android:id="@+id/txt_avg_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txt_duration"
+                android:layout_gravity="center"
+                android:text="0.00"
+                android:textAllCaps="true"
+                android:textSize="36sp"
+                style="@style/FontDefault"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/avg_speed_in_kmh"
+                android:textAllCaps="true"
+                android:textSize="10sp"
+                style="@style/FontSecondary"
+                />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/map"
+        android:layout_below="@id/container_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <Button
+        android:id="@+id/btn_start_recording"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:text="Start running"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/selector_green"
+        android:textColor="@android:color/white"
+        />
+
+</RelativeLayout>

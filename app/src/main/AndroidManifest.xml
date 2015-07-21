@@ -35,7 +35,7 @@
             android:name=".ui.MapsActivity"
             />
         <activity
-            android:name=".ui.RecordingDemoActivity"
+            android:name=".ui.RecordingActivity"
             />
         <activity
             android:name=".ui.SessionsOverviewActivity"

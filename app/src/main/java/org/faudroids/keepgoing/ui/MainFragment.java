@@ -50,7 +50,7 @@ public class MainFragment extends AbstractFragment {
 		recordingDemoButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(getActivity(), RecordingDemoActivity.class));
+				startActivity(new Intent(getActivity(), RecordingActivity.class));
 			}
 		});
 

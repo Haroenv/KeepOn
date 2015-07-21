@@ -43,6 +43,7 @@ public class RecordingManager {
 	private final SessionManager sessionManager;
 
 	private boolean isRecording = false;
+	private long recordingStartTimestamp; // unix timestamp in seconds
 	private final List<Location> recordedLocations = new ArrayList<>();
 
 	@Inject
@@ -69,9 +70,15 @@ public class RecordingManager {
 	}
 
 
+	public long getRecordingStartTimestamp() {
+		return recordingStartTimestamp;
+	}
+
+
 	public void startRecording(final GoogleApiClient googleApiClient) {
 		// mark recording start
 		isRecording = true;
+		recordingStartTimestamp = System.currentTimeMillis() / 1000;
 
 		// start recording service
 		context.startService(new Intent(context, RecordingService.class));
