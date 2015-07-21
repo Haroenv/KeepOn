@@ -1,5 +1,8 @@
 package org.faudroids.keepgoing.challenge;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -9,6 +12,7 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 import org.faudroids.keepgoing.database.KeepGoingDatabase;
 import org.roboguice.shaded.goole.common.base.Objects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -16,7 +20,7 @@ import java.util.Iterator;
 import timber.log.Timber;
 
 @Table(databaseName = KeepGoingDatabase.NAME)
-public class Challenge extends BaseModel {
+public class Challenge extends BaseModel implements Parcelable {
 
     @Column
     @PrimaryKey(autoincrement = true)
@@ -138,5 +142,38 @@ public class Challenge extends BaseModel {
 	public int hashCode() {
 		return Objects.hashCode(id, name, distance, description);
 	}
+    protected Challenge(Parcel in) {
+        id = in.readLong();
+        name = in.readString();
+        distance = in.readFloat();
+        description = in.readString();
+        sessionIds = in.readString();
+    }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
+        dest.writeFloat(distance);
+        dest.writeString(description);
+        dest.writeString(sessionIds);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Challenge> CREATOR = new Parcelable.Creator<Challenge>() {
+        @Override
+        public Challenge createFromParcel(Parcel in) {
+            return new Challenge(in);
+        }
+
+        @Override
+        public Challenge[] newArray(int size) {
+            return new Challenge[size];
+        }
+    };
 }
