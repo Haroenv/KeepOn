@@ -9,6 +9,12 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 import org.faudroids.keepgoing.database.KeepGoingDatabase;
 import org.roboguice.shaded.goole.common.base.Objects;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+
+import timber.log.Timber;
+
 @Table(databaseName = KeepGoingDatabase.NAME)
 public class Challenge extends BaseModel {
 
@@ -25,6 +31,26 @@ public class Challenge extends BaseModel {
 
 	@Column
 	private String description;
+
+	@Column
+	private String sessionIds;
+
+	private String toSessionIdString(ArrayList<String> sessionId) {
+		Iterator<String> sessionIdIterator = sessionId.iterator();
+		StringBuilder sessionIdStringBuilder = new StringBuilder();
+
+		while(sessionIdIterator.hasNext()) {
+			sessionIdStringBuilder.append(sessionIdIterator.next()).append("|");
+		}
+
+		return sessionIdStringBuilder.toString();
+	}
+
+	private ArrayList<String> fromSessionIdString(String sessionIdString) {
+		String[] sessionIds = sessionIdString.split("\\|");
+
+		return new ArrayList<>(Arrays.asList(sessionIds));
+	}
 
 	public Challenge() {
 		// empty DB constructor
@@ -67,6 +93,34 @@ public class Challenge extends BaseModel {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public void setSessionIds(String sessionIds) {
+		this.sessionIds = sessionIds;
+	}
+
+	public void setSessionIdList(ArrayList<String> sessionIds) {
+		this.setSessionIds(toSessionIdString(sessionIds));
+	}
+
+	public void addSessionIdToList(String newElement) {
+		ArrayList<String> sessionIds = this.getSessionIdList();
+		sessionIds.add(newElement);
+		this.setSessionIdList(sessionIds);
+	}
+
+	public void removeSessionIdFromList(String sessionId) {
+		ArrayList<String> sessionIds = this.getSessionIdList();
+		sessionIds.remove(sessionId);
+		this.setSessionIdList(sessionIds);
+	}
+
+	public String getSessionIds() {
+		return this.sessionIds;
+	}
+
+	public ArrayList<String> getSessionIdList() {
+		return fromSessionIdString(this.getSessionIds());
 	}
 
 	@Override
