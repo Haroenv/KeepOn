@@ -37,6 +37,12 @@ public class AuthManager {
 	}
 
 	public void signOut(GoogleApiClient googleApiClient) {
+		// clear prefs
+		namePref.clear();
+		emailPref.clear();
+		imageUrlPref.clear();
+
+		// sign out of APIs
 		Plus.AccountApi.clearDefaultAccount(googleApiClient);
 		googleApiClient.disconnect();
 		googleApiClient.connect();

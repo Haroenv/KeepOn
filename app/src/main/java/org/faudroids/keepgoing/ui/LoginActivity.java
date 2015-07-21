@@ -46,6 +46,12 @@ public class LoginActivity extends AbstractActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// check if already logged in
+		if (authManager.isSignedIn()) {
+			startMainActivity();
+			return;
+		}
+
 		// setup sign in button
 		signInButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -111,7 +117,7 @@ public class LoginActivity extends AbstractActivity {
 
 
 	private void startMainActivity() {
-		authManager.signIn(getGoogleApiClient());
+		if (!authManager.isSignedIn()) authManager.signIn(getGoogleApiClient());
 		startActivity(new Intent(LoginActivity.this, MainDrawerActivity.class));
 		finish();
 	}

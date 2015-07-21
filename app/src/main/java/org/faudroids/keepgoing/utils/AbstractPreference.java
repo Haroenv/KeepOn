@@ -24,6 +24,10 @@ abstract class AbstractPreference<T> {
 		editor.apply();
 	}
 
+	public final void clear() {
+		preferences.edit().remove(key).apply();
+	}
+
 	protected abstract void doSet(T value, SharedPreferences.Editor editor);
 
 	public final T get() {
