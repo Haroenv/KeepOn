@@ -30,9 +30,25 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="FontDefault.Green">
+        <item name="android:textColor">@color/green</item>
+    </style>
+
+    <style name="FontSecondary">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="FontHeader">
         <item name="android:textColor">@color/green</item>
         <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="CardStyle">
+        <item name="android:layout_marginRight">@dimen/card_horizontal_margin</item>
+        <item name="android:layout_marginLeft">@dimen/card_horizontal_margin</item>
+        <item name="android:layout_marginTop">@dimen/card_vertical_margin</item>
+        <item name="android:layout_marginBottom">@dimen/card_vertical_margin</item>
     </style>
 
 </resources>

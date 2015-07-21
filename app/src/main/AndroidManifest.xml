@@ -43,6 +43,9 @@
         <activity
             android:name=".ui.SessionDetailsActivity"
             />
+        <activity
+            android:name=".ui.ChallengeDetailsActivity"
+            />
         <service
             android:name=".googleapi.GoogleApiClientService"
             />

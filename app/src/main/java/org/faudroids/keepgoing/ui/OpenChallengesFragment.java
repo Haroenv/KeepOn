@@ -1,5 +1,6 @@
 package org.faudroids.keepgoing.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -106,9 +107,20 @@ public class OpenChallengesFragment extends AbstractFragment {
 		}
 
 		public void setData(final Challenge challenge) {
+			// setup view content
 			nameTextView.setText(challenge.getName());
 			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance())));
 			completedTextView.setText(getString(R.string.percentage_completed, String.valueOf(41)));
+
+			// set forward to details click listener
+			itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(getActivity(), ChallengeDetailsActivity.class);
+					intent.putExtra(ChallengeDetailsActivity.EXTRA_CHALLENGE, challenge);
+					startActivity(intent);
+				}
+			});
 		}
 
 	}
