@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="@dimen/card_horizontal_margin"
+    android:layout_marginLeft="@dimen/card_horizontal_margin"
+    android:layout_marginTop="@dimen/card_vertical_margin"
+    android:layout_marginBottom="@dimen/card_vertical_margin"
+
+    >
+
+    <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp"
+        >
+
+        <TextView
+            android:id="@+id/txt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="The Great Wall of China"
+            style="@style/FontHeader"
+            />
+
+        <TextView
+            android:id="@+id/txt_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_name"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/gray"
+            android:text="32102 km"
+            style="@style/FontDefault"
+            />
+
+        <TextView
+            android:id="@+id/txt_completed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/txt_distance"
+            android:layout_marginTop="10dp"
+            android:text="42 % completed"
+            style="@style/FontDefault"
+            />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
+
