@@ -15,38 +15,52 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="15dp"
         >
 
-        <TextView
-            android:id="@+id/txt_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="The Great Wall of China"
-            style="@style/FontHeader"
+        <ImageView
+            android:id="@+id/img_challenge"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/challenge_great_wall_of_china"
             />
 
-        <TextView
-            android:id="@+id/txt_distance"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/txt_name"
-            android:layout_marginTop="5dp"
-            android:textColor="@color/gray"
-            android:text="32102 km"
-            style="@style/FontDefault"
-            />
+            android:padding="15dp"
+            android:layout_below="@id/img_challenge"
+            android:orientation="vertical"
+            >
 
-        <TextView
-            android:id="@+id/txt_completed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/txt_distance"
-            android:layout_marginTop="10dp"
-            android:text="42 % completed"
-            style="@style/FontDefault"
-            />
+            <TextView
+                android:id="@+id/txt_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="The Great Wall of China"
+                style="@style/FontHeader"
+                />
+
+            <TextView
+                android:id="@+id/txt_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray"
+                android:text="32102 km"
+                style="@style/FontDefault"
+                />
+
+            <TextView
+                android:id="@+id/txt_completed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:text="42 % completed"
+                style="@style/FontDefault"
+                />
+        </LinearLayout>
+
 
     </RelativeLayout>
 
