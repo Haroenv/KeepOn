@@ -40,6 +40,13 @@ abstract class AbstractFragment extends RoboFragment implements GoogleApiClientL
 			throw new IllegalStateException("activity must implement " + GoogleApiClientObserver.class);
 		}
 		googleApiClientObserver = (GoogleApiClientObserver) activity;
+	}
+
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		// delay registering for api status updates until injection has been finished
 		googleApiClientObserver.registerListener(this);
 	}
 
