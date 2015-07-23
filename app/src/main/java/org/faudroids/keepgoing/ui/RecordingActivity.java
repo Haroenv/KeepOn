@@ -10,6 +10,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.MapView;
 
 import org.faudroids.keepgoing.R;
+import org.faudroids.keepgoing.challenge.Challenge;
 import org.faudroids.keepgoing.recording.RecordingManager;
 import org.faudroids.keepgoing.recording.RecordingResult;
 import org.faudroids.keepgoing.utils.DefaultTransformer;
@@ -27,6 +28,8 @@ import rx.functions.Action1;
 
 @ContentView(R.layout.activity_recording)
 public class RecordingActivity extends AbstractMapActivity {
+
+	public static final String EXTRA_CHALLENGE = "EXTRA_CHALLENGE";
 
 	@InjectView(R.id.map) private MapView mapView;
 	@InjectView(R.id.txt_duration) private TextView durationTextView;
@@ -46,6 +49,9 @@ public class RecordingActivity extends AbstractMapActivity {
 	@Override
 	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
+
+		Challenge challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
+		if (challenge == null) throw new NullPointerException("boom");
 
 		// restore button state
 		toggleRunningText();

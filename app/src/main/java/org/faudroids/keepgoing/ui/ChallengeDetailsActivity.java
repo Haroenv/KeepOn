@@ -1,6 +1,7 @@
 package org.faudroids.keepgoing.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.faudroids.keepgoing.R;
@@ -30,6 +32,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@InjectView(R.id.txt_distance_completed) private TextView completedDistanceTextView;
 	@InjectView(R.id.txt_time) private TextView timeTextView;
 	@InjectView(R.id.list_recent_activities) private ListView recentActivitiesList;
+	@InjectView(R.id.btn_add_session) private FloatingActionButton addSessionButton;
 
 	private ArrayAdapter<String> recentActivitiesAdapter;
 
@@ -38,7 +41,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		super.onCreate(savedInstanceState);
 
 		// setup challenge overview
-		Challenge challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
+		final Challenge challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
 		nameTextView.setText(challenge.getName());
 		imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getPackageName()));
 		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance())));
@@ -49,6 +52,16 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		recentActivitiesAdapter.add("5.1 km in 1 hours");
 		recentActivitiesAdapter.add("21 km in 3 hours");
 		recentActivitiesList.setAdapter(recentActivitiesAdapter);
+
+		// setup add session button
+		addSessionButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ChallengeDetailsActivity.this, RecordingActivity.class);
+				intent.putExtra(RecordingActivity.EXTRA_CHALLENGE, challenge);
+				startActivity(intent);
+			}
+		});
 	}
 
 
