@@ -18,6 +18,8 @@ import com.google.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -68,22 +70,30 @@ public class SessionManager {
 				.read(DataType.TYPE_DISTANCE_DELTA)
 				.build();
 
-		return Observable.defer(new Func0<Observable<List<SessionOverview>>>() {
-			@Override
-			public Observable<List<SessionOverview>> call() {
-				SessionReadResult readResult = Fitness.SessionsApi.readSession(googleApiClient, readRequest).await();
+		return Observable
+				.defer(new Func0<Observable<List<SessionOverview>>>() {
+					@Override
+					public Observable<List<SessionOverview>> call() {
+						SessionReadResult readResult = Fitness.SessionsApi.readSession(googleApiClient, readRequest).await();
 
-				// parse result
-				List<SessionOverview> sessionsList = new ArrayList<>();
-				for (Session session : readResult.getSessions()) {
-					for (DataSet dataSet : readResult.getDataSet(session)) {
-						sessionsList.add(new SessionOverview(session, distanceFromDataSet(dataSet)));
+						// parse result
+						List<SessionOverview> sessionsList = new ArrayList<>();
+						for (Session session : readResult.getSessions()) {
+							for (DataSet dataSet : readResult.getDataSet(session)) {
+								sessionsList.add(new SessionOverview(session, distanceFromDataSet(dataSet)));
+							}
+						}
+
+						Collections.sort(sessionsList, new Comparator<SessionOverview>() {
+							@Override
+							public int compare(SessionOverview lhs, SessionOverview rhs) {
+								return Long.valueOf(lhs.getSession().getEndTime(TimeUnit.MILLISECONDS))
+										.compareTo(rhs.getSession().getEndTime(TimeUnit.MILLISECONDS));
+							}
+						});
+						return Observable.just(sessionsList);
 					}
-				}
-
-				return Observable.just(sessionsList);
-			}
-		});
+				});
 	}
 
 

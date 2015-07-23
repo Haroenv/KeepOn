@@ -55,6 +55,18 @@ public class ChallengeManager {
 	}
 
 
+	public Observable<List<SessionOverview>> getSessionsForChallenge(final GoogleApiClient googleApiClient, Challenge challenge) {
+		return Observable.from(challenge.getSessionIdList())
+				.flatMap(new Func1<String, Observable<SessionOverview>>() {
+					@Override
+					public Observable<SessionOverview> call(String sessionId) {
+						return sessionManager.loadSessionOverview(googleApiClient, sessionId);
+					}
+				})
+				.toSortedList();
+	}
+
+
 	public Observable<Float> getDistanceForChallenge(final GoogleApiClient googleApiClient, Challenge challenge) {
 		List<String> sessionIds = challenge.getSessionIdList();
 		if (sessionIds.isEmpty()) return Observable.just(0.0f);

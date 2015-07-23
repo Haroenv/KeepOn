@@ -17,7 +17,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.challenge.Challenge;
 import org.faudroids.keepgoing.challenge.ChallengeManager;
+import org.faudroids.keepgoing.sessions.SessionOverview;
 import org.faudroids.keepgoing.utils.DefaultTransformer;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -38,7 +45,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@InjectView(R.id.txt_time) private TextView timeTextView;
 	@InjectView(R.id.list_recent_activities) private ListView recentActivitiesList;
 	@InjectView(R.id.btn_add_session) private FloatingActionButton addSessionButton;
-	private ArrayAdapter<String> recentActivitiesAdapter;
+	private ArrayAdapter<SessionOverview> recentActivitiesAdapter;
 
 	@Inject private ChallengeManager challengeManager;
 	private Challenge challenge;
@@ -55,9 +62,6 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 
 		// setup recent activities
 		recentActivitiesAdapter = new ActivitiesArrayAdapter(this);
-		recentActivitiesAdapter.add("12 km in 2 hours");
-		recentActivitiesAdapter.add("5.1 km in 1 hours");
-		recentActivitiesAdapter.add("21 km in 3 hours");
 		recentActivitiesList.setAdapter(recentActivitiesAdapter);
 
 		// setup add session button
@@ -76,7 +80,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
 
-		// setup completed kms
+		// load completed kms
 		challengeManager.getDistanceForChallenge(googleApiClient, challenge)
 				.compose(new DefaultTransformer<Float>())
 				.subscribe(new Action1<Float>() {
@@ -89,10 +93,28 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 								String.format("%.2f", completedPercentage)));
 					}
 				});
+
+		// load recent activities
+		challengeManager.getSessionsForChallenge(googleApiClient, challenge)
+				.compose(new DefaultTransformer<List<SessionOverview>>())
+				.subscribe(new Action1<List<SessionOverview>>() {
+					@Override
+					public void call(List<SessionOverview> sessions) {
+						List<SessionOverview> newestSessions = new ArrayList<>();
+						int endIdx = sessions.size() -1;
+						while (endIdx >= 0 && (sessions.size() - endIdx) <= 3) {
+							newestSessions.add(sessions.get(endIdx));
+							--endIdx;
+						}
+						recentActivitiesAdapter.clear();
+						recentActivitiesAdapter.addAll(newestSessions);
+						recentActivitiesAdapter.notifyDataSetChanged();
+					}
+				});
 	}
 
 
-	private class ActivitiesArrayAdapter extends ArrayAdapter<String> {
+	private class ActivitiesArrayAdapter extends ArrayAdapter<SessionOverview> {
 
 		public ActivitiesArrayAdapter(Context context) {
 			super(context, R.layout.item_recent_activity);
@@ -108,8 +130,9 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 			TextView dateTextView = (TextView) itemView.findViewById(R.id.txt_date);
 
 			// populate views
-			distanceTextView.setText(getItem(position));
-			dateTextView.setText("12.11.2015");
+			SessionOverview overview = getItem(position);
+			distanceTextView.setText(getString(R.string.distance_km, String.format("%.2f", overview.getTotalDistanceInMeters()  / 1000)));
+			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(overview.getSession().getStartTime(TimeUnit.MILLISECONDS))));
 
 			return itemView;
 		}
