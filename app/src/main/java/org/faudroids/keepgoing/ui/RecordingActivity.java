@@ -50,8 +50,8 @@ public class RecordingActivity extends AbstractMapActivity {
 	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
 
-		Challenge challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
-		if (challenge == null) throw new NullPointerException("boom");
+		// get arguments
+		final Challenge challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
 
 		// restore button state
 		toggleRunningText();
@@ -65,7 +65,7 @@ public class RecordingActivity extends AbstractMapActivity {
 			public void onClick(View v) {
 				if (!recordingManager.isRecording()) {
 					// start recording
-					recordingManager.startRecording(googleApiClient);
+					recordingManager.startRecording(googleApiClient, challenge);
 					Toast.makeText(RecordingActivity.this, "Recording started", Toast.LENGTH_SHORT).show();
 					toggleRunningText();
 					timeUpdateRunnable.start();

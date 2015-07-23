@@ -130,6 +130,7 @@ public class Challenge extends BaseModel implements Parcelable {
 	}
 
 	private ArrayList<String> fromSessionIdString(String sessionIdString) {
+		if (sessionIdString == null) return new ArrayList<>();
 		// parses the lists of ids from a combined id string
 		String[] sessionIds = sessionIdString.split("\\|");
 		return new ArrayList<>(Arrays.asList(sessionIds));

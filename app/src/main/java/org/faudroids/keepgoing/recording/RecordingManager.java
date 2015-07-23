@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.inject.Inject;
 
+import org.faudroids.keepgoing.challenge.Challenge;
 import org.faudroids.keepgoing.sessions.SessionManager;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class RecordingManager {
 
 	private boolean isRecording = false;
 	private long recordingStartTimestamp; // unix timestamp in seconds
+	private Challenge challenge; // which challenge this recording should be added to
 	private final List<Location> recordedLocations = new ArrayList<>();
 
 	@Inject
@@ -75,10 +77,11 @@ public class RecordingManager {
 	}
 
 
-	public void startRecording(final GoogleApiClient googleApiClient) {
+	public void startRecording(final GoogleApiClient googleApiClient, Challenge challenge) {
 		// mark recording start
-		isRecording = true;
-		recordingStartTimestamp = System.currentTimeMillis() / 1000;
+		this.isRecording = true;
+		this.recordingStartTimestamp = System.currentTimeMillis() / 1000;
+		this.challenge = challenge;
 
 		// start recording service
 		context.startService(new Intent(context, RecordingService.class));
@@ -116,7 +119,7 @@ public class RecordingManager {
 				if (!locationDataSet.isEmpty()) {
 					// create session
 					long startTimestamp = locationDataSet.getDataPoints().get(0).getTimestamp(TimeUnit.MILLISECONDS);
-					Session session = new Session.Builder()
+					final Session session = new Session.Builder()
 							.setName("TheAwesomeKeepGoingSession")
 							.setIdentifier(UUID.randomUUID().toString())
 							.setDescription("A session for testing")
@@ -125,8 +128,21 @@ public class RecordingManager {
 							.setActivity(FitnessActivities.RUNNING_JOGGING)
 							.build();
 
-					// save session
-					resultObservable = sessionManager.createSession(googleApiClient, session, locationDataSet);
+					resultObservable = sessionManager
+							// save session
+							.createSession(googleApiClient, session, locationDataSet)
+							// add session to challenge
+							.flatMap(new Func1<Status, Observable<Status>>() {
+								@Override
+								public Observable<Status> call(Status status) {
+									if (status.isSuccess()) {
+										challenge.addSessionId(session.getIdentifier());
+										challenge.save();
+									}
+									return Observable.just(status);
+								}
+							});
+
 
 				} else {
 					// discard empty sessions
