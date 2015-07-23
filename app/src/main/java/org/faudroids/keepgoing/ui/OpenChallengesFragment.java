@@ -51,14 +51,14 @@ public class OpenChallengesFragment extends AbstractFragment {
 
 
 	@Override
-	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
+	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
 		challengeManager.getAllChallenges()
 				.compose(new DefaultTransformer<List<Challenge>>())
 				.subscribe(new Action1<List<Challenge>>() {
 					@Override
 					public void call(List<Challenge> challenges) {
-						challengeAdapter.setData(challenges);
+						challengeAdapter.setData(googleApiClient, challenges);
 					}
 				});
 	}
@@ -67,6 +67,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 	private class ChallengeAdapter extends RecyclerView.Adapter {
 
 		private final List<Challenge> challengeList = new ArrayList<>();
+		private GoogleApiClient googleApiClient;
 
 		@Override
 		public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
@@ -78,7 +79,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 
 		@Override
 		public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-			((ChallengeViewHolder) viewHolder).setData(challengeList.get(position));
+			((ChallengeViewHolder) viewHolder).setData(challengeList.get(position), googleApiClient);
 		}
 
 		@Override
@@ -86,7 +87,8 @@ public class OpenChallengesFragment extends AbstractFragment {
 			return challengeList.size();
 		}
 
-		public void setData(List<Challenge> data) {
+		public void setData(GoogleApiClient googleApiClient, List<Challenge> data) {
+			this.googleApiClient = googleApiClient;
 			this.challengeList.clear();
 			this.challengeList.addAll(data);
 			notifyDataSetChanged();
@@ -109,12 +111,22 @@ public class OpenChallengesFragment extends AbstractFragment {
 			this.imageView = (ImageView) itemView.findViewById(R.id.img_challenge);
 		}
 
-		public void setData(final Challenge challenge) {
+		public void setData(final Challenge challenge, GoogleApiClient googleApiClient) {
 			// setup view content
 			nameTextView.setText(challenge.getName());
-			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance())));
-			completedTextView.setText(getString(R.string.percentage_completed, String.valueOf(41)));
+			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance() / 1000)));
 			imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getActivity().getPackageName()));
+
+			// set completed info
+			challengeManager.getDistanceForChallenge(googleApiClient, challenge)
+					.compose(new DefaultTransformer<Float>())
+					.subscribe(new Action1<Float>() {
+						@Override
+						public void call(Float completedDistanceInMeters) {
+							float completedPercentage = completedDistanceInMeters / challenge.getDistance();
+							completedTextView.setText(getString(R.string.percentage_completed, String.format("%.2f", completedPercentage)));
+						}
+					});
 
 			// set forward to details click listener
 			itemView.setOnClickListener(new View.OnClickListener() {

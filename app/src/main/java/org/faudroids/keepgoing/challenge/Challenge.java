@@ -28,7 +28,7 @@ public class Challenge extends BaseModel implements Parcelable {
 	private String name;
 
 	@Column
-	private float distance;
+	private float distance; // in meters!
 
 	@Column
 	private String description;

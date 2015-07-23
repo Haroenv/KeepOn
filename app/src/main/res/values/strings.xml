@@ -16,6 +16,7 @@
     <string name="open_challenges">Open challenges</string>
     <string name="distance_km">%1$s km</string>
     <string name="percentage_completed">%1$s%% completed</string>
+    <string name="km_and_percentage_completed">%1$s km completed (%2$s%%)</string>
 
     <string name="duration">Duration</string>
     <string name="distance_in_km">Distance (km)</string>

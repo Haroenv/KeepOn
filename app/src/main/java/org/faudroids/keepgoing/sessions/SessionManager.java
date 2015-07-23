@@ -44,6 +44,24 @@ public class SessionManager {
 	}
 
 
+	public Observable<SessionOverview> loadSessionOverview(final GoogleApiClient googleApiClient, String sessionId) {
+		// create read request (only read distance, not location for overview)
+		final SessionReadRequest readRequest = createReadRequest()
+				.read(DataType.TYPE_DISTANCE_DELTA)
+				.setSessionId(sessionId)
+				.build();
+
+		return Observable.defer(new Func0<Observable<SessionOverview>>() {
+			@Override
+			public Observable<SessionOverview> call() {
+				SessionReadResult readResult = Fitness.SessionsApi.readSession(googleApiClient, readRequest).await();
+				Session session = readResult.getSessions().get(0);
+				DataSet dataSet = readResult.getDataSet(session).get(0);
+				return Observable.just(new SessionOverview(session, distanceFromDataSet(dataSet)));
+			}
+		});
+	}
+
 	public Observable<List<SessionOverview>> loadSessionOverviews(final GoogleApiClient googleApiClient) {
 		// create read request (only read distance, not location for overview)
 		final SessionReadRequest readRequest = createReadRequest()

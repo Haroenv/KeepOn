@@ -16,9 +16,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.challenge.Challenge;
+import org.faudroids.keepgoing.challenge.ChallengeManager;
+import org.faudroids.keepgoing.utils.DefaultTransformer;
+
+import javax.inject.Inject;
 
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import rx.functions.Action1;
 
 
 @ContentView(R.layout.activity_challenge_details)
@@ -33,18 +38,20 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@InjectView(R.id.txt_time) private TextView timeTextView;
 	@InjectView(R.id.list_recent_activities) private ListView recentActivitiesList;
 	@InjectView(R.id.btn_add_session) private FloatingActionButton addSessionButton;
-
 	private ArrayAdapter<String> recentActivitiesAdapter;
+
+	@Inject private ChallengeManager challengeManager;
+	private Challenge challenge;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// setup challenge overview
-		final Challenge challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
+		challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
 		nameTextView.setText(challenge.getName());
 		imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getPackageName()));
-		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance())));
+		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance() / 1000)));
 
 		// setup recent activities
 		recentActivitiesAdapter = new ActivitiesArrayAdapter(this);
@@ -68,7 +75,20 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@Override
 	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
-		// TODO
+
+		// setup completed kms
+		challengeManager.getDistanceForChallenge(googleApiClient, challenge)
+				.compose(new DefaultTransformer<Float>())
+				.subscribe(new Action1<Float>() {
+					@Override
+					public void call(Float completedDistanceInMeters) {
+						float completedPercentage = completedDistanceInMeters / challenge.getDistance();
+						completedDistanceTextView.setText(getString(
+								R.string.km_and_percentage_completed,
+								String.format("%.1f", completedDistanceInMeters / 1000),
+								String.format("%.2f", completedPercentage)));
+					}
+				});
 	}
 
 
