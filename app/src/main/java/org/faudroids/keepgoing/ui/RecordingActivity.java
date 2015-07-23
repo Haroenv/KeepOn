@@ -163,7 +163,7 @@ public class RecordingActivity extends AbstractMapActivity {
 			// update passed time
 			long passedTimeInSeconds = System.currentTimeMillis() / 1000 - recordingManager.getRecordingStartTimestamp();
 			long hours = TimeUnit.SECONDS.toHours(passedTimeInSeconds);
-			long minutes = TimeUnit.SECONDS.toMinutes(passedTimeInSeconds);
+			long minutes = TimeUnit.SECONDS.toMinutes(passedTimeInSeconds) - (hours * 60);
 			long seconds = passedTimeInSeconds - ((hours * 60) + minutes) * 60;
 			durationTextView.setText(timeFormat.format(hours) + ":" + timeFormat.format(minutes) + ":" + timeFormat.format(seconds));
 
