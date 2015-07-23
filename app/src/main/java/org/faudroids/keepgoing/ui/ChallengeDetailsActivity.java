@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	public static final String EXTRA_CHALLENGE = "EXTRA_CHALLENGE";
 
 	@InjectView(R.id.txt_name) private TextView nameTextView;
+	@InjectView(R.id.img_challenge) private ImageView imageView;
 	@InjectView(R.id.txt_distance) private TextView distanceTextView;
 	@InjectView(R.id.txt_distance_completed) private TextView completedDistanceTextView;
 	@InjectView(R.id.txt_time) private TextView timeTextView;
@@ -38,6 +40,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		// setup challenge overview
 		Challenge challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
 		nameTextView.setText(challenge.getName());
+		imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getPackageName()));
 		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance())));
 
 		// setup recent activities

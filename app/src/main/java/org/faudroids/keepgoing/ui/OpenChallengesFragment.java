@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -97,6 +98,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 
 		private final View itemView;
 		private final TextView nameTextView, distanceTextView, completedTextView;
+		private final ImageView imageView;
 
 		public ChallengeViewHolder(View itemView) {
 			super(itemView);
@@ -104,6 +106,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 			this.nameTextView = (TextView) itemView.findViewById(R.id.txt_name);
 			this.distanceTextView = (TextView) itemView.findViewById(R.id.txt_distance);
 			this.completedTextView = (TextView) itemView.findViewById(R.id.txt_completed);
+			this.imageView = (ImageView) itemView.findViewById(R.id.img_challenge);
 		}
 
 		public void setData(final Challenge challenge) {
@@ -111,6 +114,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 			nameTextView.setText(challenge.getName());
 			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance())));
 			completedTextView.setText(getString(R.string.percentage_completed, String.valueOf(41)));
+			imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getActivity().getPackageName()));
 
 			// set forward to details click listener
 			itemView.setOnClickListener(new View.OnClickListener() {
