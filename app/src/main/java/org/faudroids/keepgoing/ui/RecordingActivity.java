@@ -36,7 +36,7 @@ public class RecordingActivity extends AbstractMapActivity {
 
 	@Inject private RecordingManager recordingManager;
 	private final RecordingListener dataListener = new RecordingListener();
-	private final TimeUpdateRunable timeUpdateRunable = new TimeUpdateRunable();
+	private final TimeUpdateRunnable timeUpdateRunnable = new TimeUpdateRunnable();
 
 	public RecordingActivity() {
 		super(true);
@@ -62,11 +62,11 @@ public class RecordingActivity extends AbstractMapActivity {
 					recordingManager.startRecording(googleApiClient);
 					Toast.makeText(RecordingActivity.this, "Recording started", Toast.LENGTH_SHORT).show();
 					toggleRunningText();
-					timeUpdateRunable.start();
+					timeUpdateRunnable.start();
 
 				} else {
 					// stop recording
-					timeUpdateRunable.stop();
+					timeUpdateRunnable.stop();
 					recordingManager
 							.stopAndSaveRecording(googleApiClient)
 							.compose(new DefaultTransformer<RecordingResult>())
@@ -104,7 +104,7 @@ public class RecordingActivity extends AbstractMapActivity {
 	public void onResume() {
 		super.onResume();
 		recordingManager.registerRecordingListener(dataListener);
-		if (recordingManager.isRecording()) timeUpdateRunable.start();
+		if (recordingManager.isRecording()) timeUpdateRunnable.start();
 	}
 
 
@@ -151,7 +151,7 @@ public class RecordingActivity extends AbstractMapActivity {
 	}
 
 
-	private class TimeUpdateRunable implements Runnable {
+	private class TimeUpdateRunnable implements Runnable {
 
 		private final DecimalFormat timeFormat = new DecimalFormat("00");
 		private boolean isRunning = false;
