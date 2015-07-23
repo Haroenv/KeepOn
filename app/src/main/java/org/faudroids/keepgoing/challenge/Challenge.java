@@ -34,17 +34,21 @@ public class Challenge extends BaseModel implements Parcelable {
 	private String description;
 
 	@Column
+	private String imageName;
+
+	@Column
 	private String sessionIds;
 
 	public Challenge() {
 		// empty DB constructor
 	}
 
-	public Challenge(long id, String name, float distance, String description) {
+	public Challenge(long id, String name, float distance, String description, String imageName) {
 		this.id = id;
 		this.name = name;
 		this.distance = distance;
 		this.description = description;
+		this.imageName = imageName;
 	}
 
 	public long getId() {
@@ -63,6 +67,14 @@ public class Challenge extends BaseModel implements Parcelable {
 		return description;
 	}
 
+	public String getImageName() {
+		return imageName;
+	}
+
+	public String getSessionIds() {
+		return this.sessionIds;
+	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -77,6 +89,10 @@ public class Challenge extends BaseModel implements Parcelable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public void setImageName(String imageName) {
+		this.imageName = imageName;
 	}
 
 	public void setSessionIds(String sessionIds) {
@@ -97,10 +113,6 @@ public class Challenge extends BaseModel implements Parcelable {
 		ArrayList<String> sessionIds = getSessionIdList();
 		sessionIds.remove(sessionId);
 		setSessionIdList(sessionIds);
-	}
-
-	public String getSessionIds() {
-		return this.sessionIds;
 	}
 
 	public ArrayList<String> getSessionIdList() {
@@ -131,18 +143,22 @@ public class Challenge extends BaseModel implements Parcelable {
 		return Objects.equal(id, challenge.id) &&
 				Objects.equal(distance, challenge.distance) &&
 				Objects.equal(name, challenge.name) &&
-				Objects.equal(description, challenge.description);
+				Objects.equal(description, challenge.description) &&
+				Objects.equal(imageName, challenge.imageName) &&
+				Objects.equal(sessionIds, challenge.sessionIds);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(id, name, distance, description);
+		return Objects.hashCode(id, name, distance, description, imageName, sessionIds);
 	}
-    protected Challenge(Parcel in) {
+
+	protected Challenge(Parcel in) {
         id = in.readLong();
         name = in.readString();
         distance = in.readFloat();
         description = in.readString();
+		imageName = in.readString();
         sessionIds = in.readString();
     }
 
@@ -157,6 +173,7 @@ public class Challenge extends BaseModel implements Parcelable {
         dest.writeString(name);
         dest.writeFloat(distance);
         dest.writeString(description);
+		dest.writeString(imageName);
         dest.writeString(sessionIds);
     }
 

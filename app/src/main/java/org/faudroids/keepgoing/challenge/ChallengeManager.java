@@ -35,7 +35,7 @@ public class ChallengeManager {
 	public Observable<List<Challenge>> getAllChallenges() {
 		if (firstStartPref.get()) {
 			firstStartPref.set(false);
-			Challenge challenge = new Challenge(0, "Hello world", 10, "Foo bar");
+			Challenge challenge = new Challenge(0, "Great Wall of China", 8851.8f, "None", "challenge_great_wall_of_china.jpg");
 			challenge.insert();
 
 		}
