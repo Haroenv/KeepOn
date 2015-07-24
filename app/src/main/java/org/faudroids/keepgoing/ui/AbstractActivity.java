@@ -56,11 +56,8 @@ abstract class AbstractActivity extends RoboActivity implements ServiceConnectio
 
 	@Override
 	public final void onServiceConnected(ComponentName name, IBinder binder) {
-		// store service ref and check if api client has been connected
-		apiClientService = ((GoogleApiClientService.LocalBinder) binder).getService();
-		if (isGoogleApiClientConnected()) onGoogleApiClientConnected(apiClientService.getGoogleApiClient());
-
 		// start listening for api connection
+		apiClientService = ((GoogleApiClientService.LocalBinder) binder).getService();
 		apiClientService.registerConnectionListener(this);
 	}
 
