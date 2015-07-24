@@ -19,13 +19,13 @@ import com.google.inject.Inject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.functions.Func0;
+import timber.log.Timber;
 
 public class SessionManager {
 
@@ -46,80 +46,48 @@ public class SessionManager {
 	}
 
 
-	public Observable<SessionOverview> loadSessionOverview(final GoogleApiClient googleApiClient, String sessionId) {
+	public Observable<SessionData> loadSessionData(final GoogleApiClient googleApiClient, final String sessionId) {
 		// create read request (only read distance, not location for overview)
 		final SessionReadRequest readRequest = createReadRequest()
-				.read(DataType.TYPE_DISTANCE_DELTA)
 				.setSessionId(sessionId)
 				.build();
-
-		return Observable.defer(new Func0<Observable<SessionOverview>>() {
+		return Observable.defer(new Func0<Observable<SessionData>>() {
 			@Override
-			public Observable<SessionOverview> call() {
+			public Observable<SessionData> call() {
 				SessionReadResult readResult = Fitness.SessionsApi.readSession(googleApiClient, readRequest).await();
+
+				if (readResult.getSessions().isEmpty()) throw new IllegalStateException("error finding session " + sessionId);
+
+				// parse result
 				Session session = readResult.getSessions().get(0);
-				DataSet dataSet = readResult.getDataSet(session).get(0);
-				return Observable.just(new SessionOverview(session, distanceFromDataSet(dataSet)));
+				List<Location> locations = locationsFromDataSet(readResult.getDataSet(session, DataType.TYPE_LOCATION_SAMPLE).get(0));
+				Timber.d("found " + locations.size() + " locations");
+				return Observable.just(new SessionData(session, locations));
 			}
 		});
 	}
 
-	public Observable<List<SessionOverview>> loadSessionOverviews(final GoogleApiClient googleApiClient) {
+	public Observable<List<SessionData>> loadSessionData(final GoogleApiClient googleApiClient) {
 		// create read request (only read distance, not location for overview)
-		final SessionReadRequest readRequest = createReadRequest()
-				.read(DataType.TYPE_DISTANCE_DELTA)
-				.build();
-
+		final SessionReadRequest readRequest = createReadRequest().build();
 		return Observable
-				.defer(new Func0<Observable<List<SessionOverview>>>() {
+				.defer(new Func0<Observable<List<SessionData>>>() {
 					@Override
-					public Observable<List<SessionOverview>> call() {
+					public Observable<List<SessionData>> call() {
 						SessionReadResult readResult = Fitness.SessionsApi.readSession(googleApiClient, readRequest).await();
 
 						// parse result
-						List<SessionOverview> sessionsList = new ArrayList<>();
+						List<SessionData> sessionsList = new ArrayList<>();
 						for (Session session : readResult.getSessions()) {
-							for (DataSet dataSet : readResult.getDataSet(session)) {
-								sessionsList.add(new SessionOverview(session, distanceFromDataSet(dataSet)));
-							}
+							List<Location> locations = locationsFromDataSet(readResult.getDataSet(session, DataType.TYPE_LOCATION_SAMPLE).get(0));
+							Timber.d("found " +locations.size() + " locations");
+							sessionsList.add(new SessionData(session, locations));
 						}
 
-						Collections.sort(sessionsList, new Comparator<SessionOverview>() {
-							@Override
-							public int compare(SessionOverview lhs, SessionOverview rhs) {
-								return Long.valueOf(lhs.getSession().getEndTime(TimeUnit.MILLISECONDS))
-										.compareTo(rhs.getSession().getEndTime(TimeUnit.MILLISECONDS));
-							}
-						});
+						Collections.sort(sessionsList);
 						return Observable.just(sessionsList);
 					}
 				});
-	}
-
-
-	public Observable<SessionDetails> loadSessionDetails(final GoogleApiClient googleApiClient, final String sessionId) {
-		// create read request (only read distance, not location for overview)
-		final SessionReadRequest readRequest = createReadRequest()
-				.read(DataType.TYPE_DISTANCE_DELTA)
-				.read(DataType.TYPE_LOCATION_SAMPLE)
-				.setSessionId(sessionId)
-				.build();
-
-		return Observable.defer(new Func0<Observable<SessionDetails>>() {
-			@Override
-			public Observable<SessionDetails> call() {
-				SessionReadResult readResult = Fitness.SessionsApi.readSession(googleApiClient, readRequest).await();
-
-				// parse result
-				for (Session session : readResult.getSessions()) {
-					float distance = distanceFromDataSet(readResult.getDataSet(session, DataType.TYPE_DISTANCE_DELTA).get(0));
-					List<Location> locations = locationsFromDataSet(readResult.getDataSet(session, DataType.TYPE_LOCATION_SAMPLE).get(0));
-					return Observable.just(new SessionDetails(session, distance, locations));
-				}
-
-				throw new IllegalStateException("error finding session " + sessionId);
-			}
-		});
 	}
 
 
@@ -135,16 +103,8 @@ public class SessionManager {
 		// create read request (only read distance, not location for overview)
 		return new SessionReadRequest
 				.Builder()
-				.setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
-	}
-
-
-	private float distanceFromDataSet(DataSet distanceDataSet) {
-		float distance = 0;
-		for (DataPoint dataPoint : distanceDataSet.getDataPoints()) {
-			distance += dataPoint.getValue(Field.FIELD_DISTANCE).asFloat();
-		}
-		return distance;
+				.setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS)
+				.read(DataType.TYPE_LOCATION_SAMPLE);
 	}
 
 

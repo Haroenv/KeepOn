@@ -6,8 +6,8 @@ import com.raizlabs.android.dbflow.runtime.transaction.SelectListTransaction;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.faudroids.keepgoing.database.TransactionListenerAdapter;
+import org.faudroids.keepgoing.sessions.SessionData;
 import org.faudroids.keepgoing.sessions.SessionManager;
-import org.faudroids.keepgoing.sessions.SessionOverview;
 import org.faudroids.keepgoing.utils.BooleanPreference;
 import org.faudroids.keepgoing.utils.PreferenceFactory;
 
@@ -56,12 +56,12 @@ public class ChallengeManager {
 	}
 
 
-	public Observable<List<SessionOverview>> getSessionsForChallenge(final GoogleApiClient googleApiClient, Challenge challenge) {
+	public Observable<List<SessionData>> getSessionsForChallenge(final GoogleApiClient googleApiClient, Challenge challenge) {
 		return Observable.from(challenge.getSessionIdList())
-				.flatMap(new Func1<String, Observable<SessionOverview>>() {
+				.flatMap(new Func1<String, Observable<SessionData>>() {
 					@Override
-					public Observable<SessionOverview> call(String sessionId) {
-						return sessionManager.loadSessionOverview(googleApiClient, sessionId);
+					public Observable<SessionData> call(String sessionId) {
+						return sessionManager.loadSessionData(googleApiClient, sessionId);
 					}
 				})
 				.toSortedList();
@@ -72,12 +72,12 @@ public class ChallengeManager {
 		List<String> sessionIds = challenge.getSessionIdList();
 		if (sessionIds.isEmpty()) return Observable.just(0.0f);
 		return getSessionsForChallenge(googleApiClient,  challenge)
-				.flatMap(new Func1<List<SessionOverview>, Observable<Float>>() {
+				.flatMap(new Func1<List<SessionData>, Observable<Float>>() {
 					@Override
-					public Observable<Float> call(List<SessionOverview> sessionOverviews) {
+					public Observable<Float> call(List<SessionData> sessionOverviews) {
 						float distance = 0;
-						for (SessionOverview overview : sessionOverviews) {
-							distance += overview.getTotalDistanceInMeters();
+						for (SessionData overview : sessionOverviews) {
+							distance += overview.getDistanceInMeters();
 						}
 						return Observable.just(distance);
 					}
@@ -89,12 +89,12 @@ public class ChallengeManager {
 		List<String> sessionIds = challenge.getSessionIdList();
 		if (sessionIds.isEmpty()) return Observable.just(0l);
 		return getSessionsForChallenge(googleApiClient,  challenge)
-				.flatMap(new Func1<List<SessionOverview>, Observable<Long>>() {
+				.flatMap(new Func1<List<SessionData>, Observable<Long>>() {
 					@Override
-					public Observable<Long> call(List<SessionOverview> sessionOverviews) {
+					public Observable<Long> call(List<SessionData> sessionOverviews) {
 						long totalTime = 0;
-						for (SessionOverview overview : sessionOverviews) {
-							totalTime += (overview.getSession().getEndTime(TimeUnit.SECONDS) - overview.getSession().getStartTime(TimeUnit.SECONDS));
+						for (SessionData data : sessionOverviews) {
+							totalTime += (data.getSession().getEndTime(TimeUnit.SECONDS) - data.getSession().getStartTime(TimeUnit.SECONDS));
 						}
 						return Observable.just(totalTime);
 					}

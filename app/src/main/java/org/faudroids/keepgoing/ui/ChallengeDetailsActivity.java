@@ -17,7 +17,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.challenge.Challenge;
 import org.faudroids.keepgoing.challenge.ChallengeManager;
-import org.faudroids.keepgoing.sessions.SessionOverview;
+import org.faudroids.keepgoing.sessions.SessionData;
 import org.faudroids.keepgoing.utils.DefaultTransformer;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +45,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@InjectView(R.id.txt_time) private TextView timeTextView;
 	@InjectView(R.id.list_recent_activities) private ListView recentActivitiesList;
 	@InjectView(R.id.btn_add_session) private FloatingActionButton addSessionButton;
-	private ArrayAdapter<SessionOverview> recentActivitiesAdapter;
+	private ArrayAdapter<SessionData> recentActivitiesAdapter;
 
 	@Inject private ChallengeManager challengeManager;
 	private Challenge challenge;
@@ -107,11 +107,11 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 
 		// load recent activities
 		challengeManager.getSessionsForChallenge(googleApiClient, challenge)
-				.compose(new DefaultTransformer<List<SessionOverview>>())
-				.subscribe(new Action1<List<SessionOverview>>() {
+				.compose(new DefaultTransformer<List<SessionData>>())
+				.subscribe(new Action1<List<SessionData>>() {
 					@Override
-					public void call(List<SessionOverview> sessions) {
-						List<SessionOverview> newestSessions = new ArrayList<>();
+					public void call(List<SessionData> sessions) {
+						List<SessionData> newestSessions = new ArrayList<>();
 						int endIdx = sessions.size() - 1;
 						while (endIdx >= 0 && (sessions.size() - endIdx) <= 3) {
 							newestSessions.add(sessions.get(endIdx));
@@ -125,7 +125,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	}
 
 
-	private class ActivitiesArrayAdapter extends ArrayAdapter<SessionOverview> {
+	private class ActivitiesArrayAdapter extends ArrayAdapter<SessionData> {
 
 		public ActivitiesArrayAdapter(Context context) {
 			super(context, R.layout.item_recent_activity);
@@ -141,16 +141,16 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 			TextView dateTextView = (TextView) itemView.findViewById(R.id.txt_date);
 
 			// populate views
-			final SessionOverview overview = getItem(position);
-			distanceTextView.setText(getString(R.string.distance_km, String.format("%.2f", overview.getTotalDistanceInMeters()  / 1000)));
-			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(overview.getSession().getStartTime(TimeUnit.MILLISECONDS))));
+			final SessionData data = getItem(position);
+			distanceTextView.setText(getString(R.string.distance_km, String.format("%.2f", data.getDistanceInMeters() / 1000)));
+			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(data.getSession().getStartTime(TimeUnit.MILLISECONDS))));
 
 			// on click forward to session details
 			itemView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(ChallengeDetailsActivity.this, SessionDetailsActivity.class);
-					intent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, overview.getSession().getIdentifier());
+					intent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, data.getSession().getIdentifier());
 					startActivity(intent);
 				}
 			});

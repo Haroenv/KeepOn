@@ -11,10 +11,10 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.faudroids.keepgoing.sessions.SessionData;
 import org.faudroids.keepgoing.utils.DefaultTransformer;
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.sessions.SessionManager;
-import org.faudroids.keepgoing.sessions.SessionOverview;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,11 +51,11 @@ public class SessionsOverviewActivity extends AbstractActivity {
 	@Override
 	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
-		sessionManager.loadSessionOverviews(googleApiClient)
-				.compose(new DefaultTransformer<List<SessionOverview>>())
-				.subscribe(new Action1<List<SessionOverview>>() {
+		sessionManager.loadSessionData(googleApiClient)
+				.compose(new DefaultTransformer<List<SessionData>>())
+				.subscribe(new Action1<List<SessionData>>() {
 					@Override
-					public void call(List<SessionOverview> sessionOverviews) {
+					public void call(List<SessionData> sessionOverviews) {
 						sessionsAdapter.setData(sessionOverviews);
 					}
 				});
@@ -64,7 +64,7 @@ public class SessionsOverviewActivity extends AbstractActivity {
 
 	private class SessionsAdapter extends RecyclerView.Adapter {
 
-		private final List<SessionOverview> sessionsList = new ArrayList<>();
+		private final List<SessionData> sessionsList = new ArrayList<>();
 
 		@Override
 		public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
@@ -85,7 +85,7 @@ public class SessionsOverviewActivity extends AbstractActivity {
 			return sessionsList.size();
 		}
 
-		public void setData(List<SessionOverview> data) {
+		public void setData(List<SessionData> data) {
 			this.sessionsList.clear();;
 			this.sessionsList.addAll(data);
 			notifyDataSetChanged();
@@ -105,17 +105,17 @@ public class SessionsOverviewActivity extends AbstractActivity {
 			this.distanceTextView = (TextView) itemView.findViewById(R.id.txt_distance);
 		}
 
-		public void setData(final SessionOverview overview) {
+		public void setData(final SessionData data) {
 			itemView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Intent detailsIntent = new Intent(SessionsOverviewActivity.this, SessionDetailsActivity.class);
-					detailsIntent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, overview.getSession().getIdentifier());
+					detailsIntent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, data.getSession().getIdentifier());
 					startActivity(detailsIntent);
 				}
 			});
-			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(overview.getSession().getStartTime(TimeUnit.MILLISECONDS))));
-			distanceTextView.setText(overview.getTotalDistanceInMeters() + " m");
+			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(data.getSession().getStartTime(TimeUnit.MILLISECONDS))));
+			distanceTextView.setText(data.getDistanceInMeters() + " m");
 		}
 
 	}

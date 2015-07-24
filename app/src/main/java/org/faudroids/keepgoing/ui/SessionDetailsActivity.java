@@ -6,7 +6,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.faudroids.keepgoing.utils.DefaultTransformer;
 import org.faudroids.keepgoing.R;
-import org.faudroids.keepgoing.sessions.SessionDetails;
+import org.faudroids.keepgoing.sessions.SessionData;
 import org.faudroids.keepgoing.sessions.SessionManager;
 
 import javax.inject.Inject;
@@ -35,14 +35,14 @@ public class SessionDetailsActivity extends AbstractMapActivity {
 		String sessionId = getIntent().getStringExtra(EXTRA_SESSION_ID);
 		Timber.i("loading session with id " + sessionId);
 
-		sessionManager.loadSessionDetails(googleApiClient, sessionId)
-				.compose(new DefaultTransformer<SessionDetails>())
-				.subscribe(new Action1<SessionDetails>() {
+		sessionManager.loadSessionData(googleApiClient, sessionId)
+				.compose(new DefaultTransformer<SessionData>())
+				.subscribe(new Action1<SessionData>() {
 					@Override
-					public void call(SessionDetails sessionDetails) {
-						Timber.d("drawing " + sessionDetails.getLocations().size() + " waypoints and distance of " + sessionDetails.getTotalDistanceInMeters());
-						drawPolyline(sessionDetails.getLocations());
-						distanceView.setText(sessionDetails.getTotalDistanceInMeters() + " m");
+					public void call(SessionData sessionData) {
+						Timber.d("drawing " + sessionData.getLocations().size() + " waypoints and distance of " + sessionData.getDistanceInMeters());
+						drawPolyline(sessionData.getLocations());
+						distanceView.setText(sessionData.getDistanceInMeters() + " m");
 					}
 				});
 	}
