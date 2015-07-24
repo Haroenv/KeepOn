@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import roboguice.inject.InjectView;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 
 abstract class AbstractChallengesFragment extends AbstractFragment {
@@ -51,6 +52,7 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
 		challengeManager.getAllChallenges(googleApiClient)
+				.flatMap(filterChallenges())
 				.compose(new DefaultTransformer<List<ChallengeData>>())
 				.subscribe(new Action1<List<ChallengeData>>() {
 					@Override
@@ -61,7 +63,7 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 	}
 
 
-	protected abstract Observable<List<ChallengeData>> filterChallenges(Observable<List<ChallengeData>> challengeObservable);
+	protected abstract Func1<List<ChallengeData>, Observable<List<ChallengeData>>> filterChallenges();
 	protected abstract AbstractChallengeViewHolder onCreateViewHolder(ViewGroup viewGroup);
 
 

@@ -22,6 +22,7 @@ public class MainDrawerActivity extends AbstractRoboDrawerActivity {
 		// setup sections
 		addSection(newSection(getString(R.string.section_demo), new MainFragment()));
 		addSection(newSection(getString(R.string.open_challenges), new OpenChallengesFragment()));
+		addSection(newSection(getString(R.string.finished_challenges), new FinishedChallengesFragment()));
 
 		// setup account
 		Account account = authManager.getAccount();

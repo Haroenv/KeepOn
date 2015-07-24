@@ -14,6 +14,7 @@
     <string name="feedback_mail_subject">Feedback TODO</string>
 
     <string name="open_challenges">Open challenges</string>
+    <string name="finished_challenges">Finished challenges</string>
     <string name="distance_km">%1$s km</string>
     <string name="percentage_completed">%1$s%% completed</string>
     <string name="km_and_percentage_completed">%1$s km completed (%2$s%%)</string>

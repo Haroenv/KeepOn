@@ -45,7 +45,7 @@ public class ChallengeData implements Parcelable, Comparable<ChallengeData> {
 	}
 
 	public boolean isOpen() {
-		return getCompletedDistanceInMeters() >= challenge.getDistanceInMeters();
+		return getCompletedDistanceInMeters() < challenge.getDistanceInMeters();
 	}
 
 

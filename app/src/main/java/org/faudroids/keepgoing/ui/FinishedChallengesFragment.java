@@ -1,6 +1,5 @@
 package org.faudroids.keepgoing.ui;
 
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +16,9 @@ import rx.Observable;
 import rx.functions.Func1;
 
 
-public class OpenChallengesFragment extends AbstractChallengesFragment {
+public class FinishedChallengesFragment extends AbstractChallengesFragment {
 
-	public OpenChallengesFragment() {
+	public FinishedChallengesFragment() {
 		super(R.layout.fragment_challenge_overview);
 	}
 
@@ -31,7 +30,7 @@ public class OpenChallengesFragment extends AbstractChallengesFragment {
 			public Observable<List<ChallengeData>> call(List<ChallengeData> data) {
 				Iterator<ChallengeData> iter = data.iterator();
 				while (iter.hasNext()) {
-					if (!iter.next().isOpen()) iter.remove();
+					if (iter.next().isOpen()) iter.remove();
 				}
 				return Observable.just(data);
 			}
@@ -43,23 +42,21 @@ public class OpenChallengesFragment extends AbstractChallengesFragment {
 	protected AbstractChallengeViewHolder onCreateViewHolder(ViewGroup viewGroup) {
 		View view = LayoutInflater
 				.from(viewGroup.getContext())
-				.inflate(R.layout.card_challenge_open, viewGroup, false);
+				.inflate(R.layout.card_challenge_finished, viewGroup, false);
 		return new ChallengeViewHolder(view);
 	}
 
 
 	private class ChallengeViewHolder extends AbstractChallengeViewHolder {
 
-		private final View itemView;
-		private final TextView nameTextView, distanceTextView, completedTextView;
+		private final TextView nameTextView, distanceTextView, timeTextView;
 		private final ImageView imageView;
 
 		public ChallengeViewHolder(View itemView) {
 			super(itemView);
-			this.itemView = itemView;
 			this.nameTextView = (TextView) itemView.findViewById(R.id.txt_name);
 			this.distanceTextView = (TextView) itemView.findViewById(R.id.txt_distance);
-			this.completedTextView = (TextView) itemView.findViewById(R.id.txt_completed);
+			this.timeTextView = (TextView) itemView.findViewById(R.id.txt_time);
 			this.imageView = (ImageView) itemView.findViewById(R.id.img_challenge);
 		}
 
@@ -67,22 +64,12 @@ public class OpenChallengesFragment extends AbstractChallengesFragment {
 		public void setData(final ChallengeData challengeData) {
 			// setup view content
 			nameTextView.setText(challengeData.getChallenge().getName());
-			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
 			imageView.setImageResource(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getActivity().getPackageName()));
 
 			// set completed info
-			float completedPercentage = challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters();
-			completedTextView.setText(getString(R.string.percentage_completed, String.format("%.2f", completedPercentage)));
-
-			// set forward to details click listener
-			itemView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(getActivity(), ChallengeDetailsActivity.class);
-					intent.putExtra(ChallengeDetailsActivity.EXTRA_CHALLENGE_DATA, challengeData);
-					startActivity(intent);
-				}
-			});
+			distanceTextView.setText(getString(R.string.distance_km, String.format("%.1f", challengeData.getCompletedDistanceInMeters() / 1000f)));
+			float hours = challengeData.getCompletedTimeInSeconds() / (60.0f * 60.0f);
+			timeTextView.setText(getString(R.string.hours_of_running, String.format("%.1f", hours)));
 		}
 
 	}
