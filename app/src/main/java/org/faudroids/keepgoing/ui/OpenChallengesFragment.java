@@ -118,7 +118,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 			imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getActivity().getPackageName()));
 
 			// set completed info
-			challengeManager.getDistanceForChallenge(googleApiClient, challenge)
+			challengeManager.getDistanceInMetersForChallenge(googleApiClient, challenge)
 					.compose(new DefaultTransformer<Float>())
 					.subscribe(new Action1<Float>() {
 						@Override

@@ -81,7 +81,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		super.onGoogleApiClientConnected(googleApiClient);
 
 		// load completed kms
-		challengeManager.getDistanceForChallenge(googleApiClient, challenge)
+		challengeManager.getDistanceInMetersForChallenge(googleApiClient, challenge)
 				.compose(new DefaultTransformer<Float>())
 				.subscribe(new Action1<Float>() {
 					@Override
@@ -94,6 +94,17 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 					}
 				});
 
+		// load running time
+		challengeManager.getTotalTimeInSeconds(googleApiClient, challenge)
+				.compose(new DefaultTransformer<Long>())
+				.subscribe(new Action1<Long>() {
+					@Override
+					public void call(Long totalTimeInSeconds) {
+						float hours = totalTimeInSeconds / (60.0f * 60.0f);
+						timeTextView.setText(getString(R.string.hours_of_running, String.format("%.1f", hours)));
+					}
+				});
+
 		// load recent activities
 		challengeManager.getSessionsForChallenge(googleApiClient, challenge)
 				.compose(new DefaultTransformer<List<SessionOverview>>())
@@ -101,7 +112,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 					@Override
 					public void call(List<SessionOverview> sessions) {
 						List<SessionOverview> newestSessions = new ArrayList<>();
-						int endIdx = sessions.size() -1;
+						int endIdx = sessions.size() - 1;
 						while (endIdx >= 0 && (sessions.size() - endIdx) <= 3) {
 							newestSessions.add(sessions.get(endIdx));
 							--endIdx;
