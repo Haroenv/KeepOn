@@ -12,11 +12,11 @@ import org.faudroids.keepgoing.utils.BooleanPreference;
 import org.faudroids.keepgoing.utils.PreferenceFactory;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.functions.Func0;
 import rx.functions.Func1;
 
 /**
@@ -40,65 +40,60 @@ public class ChallengeManager {
 	}
 
 
-	public Observable<List<Challenge>> getAllChallenges() {
-		if (firstStartPref.get()) {
-			firstStartPref.set(false);
-			Challenge challenge = new Challenge(0, "Great Wall of China", 8851800, "None", "challenge_great_wall_of_china");
-			challenge.insert();
-		}
-
-		TransactionListenerAdapter<List<Challenge>> adapter = new TransactionListenerAdapter<>();
-		transactionManager.addTransaction(new SelectListTransaction<>(
-				new Select().all().from(Challenge.class),
-				adapter));
-
-		return adapter.toObservable();
-	}
-
-
-	public Observable<List<SessionData>> getSessionsForChallenge(final GoogleApiClient googleApiClient, Challenge challenge) {
-		return Observable.from(challenge.getSessionIdList())
-				.flatMap(new Func1<String, Observable<SessionData>>() {
+	public Observable<List<ChallengeData>> getAllChallenges(final GoogleApiClient googleApiClient) {
+		return setupChallenges()
+				.flatMap(new Func1<Void, Observable<List<Challenge>>>() {
 					@Override
-					public Observable<SessionData> call(String sessionId) {
-						return sessionManager.loadSessionData(googleApiClient, sessionId);
+					public Observable<List<Challenge>> call(Void nothing) {
+						TransactionListenerAdapter<List<Challenge>> adapter = new TransactionListenerAdapter<>();
+						transactionManager.addTransaction(new SelectListTransaction<>(
+								new Select().all().from(Challenge.class),
+								adapter));
+
+						return adapter.toObservable();
+					}
+				})
+				.flatMap(new Func1<List<Challenge>, Observable<Challenge>>() {
+					@Override
+					public Observable<Challenge> call(List<Challenge> challenges) {
+						return Observable.from(challenges);
+					}
+				})
+				.flatMap(new Func1<Challenge, Observable<ChallengeData>>() {
+					@Override
+					public Observable<ChallengeData> call(final Challenge challenge) {
+						return Observable.from(challenge.getSessionIdList())
+								.flatMap(new Func1<String, Observable<SessionData>>() {
+									@Override
+									public Observable<SessionData> call(String sessionId) {
+										return sessionManager.loadSessionData(googleApiClient, sessionId);
+									}
+								})
+								.toSortedList()
+								.map(new Func1<List<SessionData>, ChallengeData>() {
+									@Override
+									public ChallengeData call(List<SessionData> sessionDataList) {
+										return new ChallengeData(challenge, sessionDataList);
+									}
+								});
 					}
 				})
 				.toSortedList();
 	}
 
 
-	public Observable<Float> getDistanceInMetersForChallenge(final GoogleApiClient googleApiClient, Challenge challenge) {
-		List<String> sessionIds = challenge.getSessionIdList();
-		if (sessionIds.isEmpty()) return Observable.just(0.0f);
-		return getSessionsForChallenge(googleApiClient,  challenge)
-				.flatMap(new Func1<List<SessionData>, Observable<Float>>() {
-					@Override
-					public Observable<Float> call(List<SessionData> sessionOverviews) {
-						float distance = 0;
-						for (SessionData overview : sessionOverviews) {
-							distance += overview.getDistanceInMeters();
-						}
-						return Observable.just(distance);
-					}
-				});
-	}
-
-
-	public Observable<Long> getTotalTimeInSeconds(final GoogleApiClient googleApiClient, Challenge challenge) {
-		List<String> sessionIds = challenge.getSessionIdList();
-		if (sessionIds.isEmpty()) return Observable.just(0l);
-		return getSessionsForChallenge(googleApiClient,  challenge)
-				.flatMap(new Func1<List<SessionData>, Observable<Long>>() {
-					@Override
-					public Observable<Long> call(List<SessionData> sessionOverviews) {
-						long totalTime = 0;
-						for (SessionData data : sessionOverviews) {
-							totalTime += (data.getSession().getEndTime(TimeUnit.SECONDS) - data.getSession().getStartTime(TimeUnit.SECONDS));
-						}
-						return Observable.just(totalTime);
-					}
-				});
+	private Observable<Void> setupChallenges() {
+		return Observable.defer(new Func0<Observable<Void>>() {
+			@Override
+			public Observable<Void> call() {
+				if (firstStartPref.get()) {
+					firstStartPref.set(false);
+					Challenge challenge = new Challenge(0, "Great Wall of China", 8851800, "None", "challenge_great_wall_of_china");
+					challenge.insert();
+				}
+				return Observable.just(null);
+			}
+		});
 	}
 
 }

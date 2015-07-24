@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.faudroids.keepgoing.R;
-import org.faudroids.keepgoing.challenge.Challenge;
+import org.faudroids.keepgoing.challenge.ChallengeData;
 import org.faudroids.keepgoing.challenge.ChallengeManager;
 import org.faudroids.keepgoing.utils.DefaultTransformer;
 
@@ -53,12 +53,12 @@ public class OpenChallengesFragment extends AbstractFragment {
 	@Override
 	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
-		challengeManager.getAllChallenges()
-				.compose(new DefaultTransformer<List<Challenge>>())
-				.subscribe(new Action1<List<Challenge>>() {
+		challengeManager.getAllChallenges(googleApiClient)
+				.compose(new DefaultTransformer<List<ChallengeData>>())
+				.subscribe(new Action1<List<ChallengeData>>() {
 					@Override
-					public void call(List<Challenge> challenges) {
-						challengeAdapter.setData(googleApiClient, challenges);
+					public void call(List<ChallengeData> challenges) {
+						challengeAdapter.setData(challenges);
 					}
 				});
 	}
@@ -66,8 +66,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 
 	private class ChallengeAdapter extends RecyclerView.Adapter {
 
-		private final List<Challenge> challengeList = new ArrayList<>();
-		private GoogleApiClient googleApiClient;
+		private final List<ChallengeData> challengeDataList = new ArrayList<>();
 
 		@Override
 		public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
@@ -79,18 +78,17 @@ public class OpenChallengesFragment extends AbstractFragment {
 
 		@Override
 		public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-			((ChallengeViewHolder) viewHolder).setData(challengeList.get(position), googleApiClient);
+			((ChallengeViewHolder) viewHolder).setData(challengeDataList.get(position));
 		}
 
 		@Override
 		public int getItemCount() {
-			return challengeList.size();
+			return challengeDataList.size();
 		}
 
-		public void setData(GoogleApiClient googleApiClient, List<Challenge> data) {
-			this.googleApiClient = googleApiClient;
-			this.challengeList.clear();
-			this.challengeList.addAll(data);
+		public void setData(List<ChallengeData> data) {
+			this.challengeDataList.clear();
+			this.challengeDataList.addAll(data);
 			notifyDataSetChanged();
 		}
 	}
@@ -111,29 +109,22 @@ public class OpenChallengesFragment extends AbstractFragment {
 			this.imageView = (ImageView) itemView.findViewById(R.id.img_challenge);
 		}
 
-		public void setData(final Challenge challenge, GoogleApiClient googleApiClient) {
+		public void setData(final ChallengeData challengeData) {
 			// setup view content
-			nameTextView.setText(challenge.getName());
-			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistanceInMeters() / 1000)));
-			imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getActivity().getPackageName()));
+			nameTextView.setText(challengeData.getChallenge().getName());
+			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
+			imageView.setImageResource(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getActivity().getPackageName()));
 
 			// set completed info
-			challengeManager.getDistanceInMetersForChallenge(googleApiClient, challenge)
-					.compose(new DefaultTransformer<Float>())
-					.subscribe(new Action1<Float>() {
-						@Override
-						public void call(Float completedDistanceInMeters) {
-							float completedPercentage = completedDistanceInMeters / challenge.getDistanceInMeters();
-							completedTextView.setText(getString(R.string.percentage_completed, String.format("%.2f", completedPercentage)));
-						}
-					});
+			float completedPercentage = challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters();
+			completedTextView.setText(getString(R.string.percentage_completed, String.format("%.2f", completedPercentage)));
 
 			// set forward to details click listener
 			itemView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), ChallengeDetailsActivity.class);
-					intent.putExtra(ChallengeDetailsActivity.EXTRA_CHALLENGE, challenge);
+					intent.putExtra(ChallengeDetailsActivity.EXTRA_CHALLENGE_DATA, challengeData);
 					startActivity(intent);
 				}
 			});

@@ -12,13 +12,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.faudroids.keepgoing.R;
-import org.faudroids.keepgoing.challenge.Challenge;
+import org.faudroids.keepgoing.challenge.ChallengeData;
 import org.faudroids.keepgoing.challenge.ChallengeManager;
 import org.faudroids.keepgoing.sessions.SessionData;
-import org.faudroids.keepgoing.utils.DefaultTransformer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,13 +28,12 @@ import javax.inject.Inject;
 
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
-import rx.functions.Action1;
 
 
 @ContentView(R.layout.activity_challenge_details)
 public class ChallengeDetailsActivity extends AbstractActivity {
 
-	public static final String EXTRA_CHALLENGE = "EXTRA_CHALLENGE";
+	public static final String EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA";
 
 	@InjectView(R.id.txt_name) private TextView nameTextView;
 	@InjectView(R.id.img_challenge) private ImageView imageView;
@@ -48,80 +45,51 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	private ArrayAdapter<SessionData> recentActivitiesAdapter;
 
 	@Inject private ChallengeManager challengeManager;
-	private Challenge challenge;
+	private ChallengeData challengeData;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// setup challenge overview
-		challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
-		nameTextView.setText(challenge.getName());
-		imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getPackageName()));
-		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistanceInMeters() / 1000)));
+		challengeData = getIntent().getParcelableExtra(EXTRA_CHALLENGE_DATA);
+		nameTextView.setText(challengeData.getChallenge().getName());
+		imageView.setImageResource(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getPackageName()));
+		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
+
+		// set completed kms
+		float completedPercentage = challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters();
+		completedDistanceTextView.setText(getString(
+				R.string.km_and_percentage_completed,
+				String.format("%.1f", challengeData.getCompletedDistanceInMeters() / 1000),
+				String.format("%.2f", completedPercentage)));
+
+		// load running time
+		float hours = challengeData.getCompletedTimeInSeconds() / (60.0f * 60.0f);
+		timeTextView.setText(getString(R.string.hours_of_running, String.format("%.1f", hours)));
 
 		// setup recent activities
 		recentActivitiesAdapter = new ActivitiesArrayAdapter(this);
 		recentActivitiesList.setAdapter(recentActivitiesAdapter);
+		List<SessionData> newestSessions = new ArrayList<>();
+		int endIdx = challengeData.getSessionDataList().size() - 1;
+		while (endIdx >= 0 && (challengeData.getSessionDataList().size() - endIdx) <= 3) {
+			newestSessions.add(challengeData.getSessionDataList().get(endIdx));
+			--endIdx;
+		}
+		recentActivitiesAdapter.clear();
+		recentActivitiesAdapter.addAll(newestSessions);
+		recentActivitiesAdapter.notifyDataSetChanged();
 
 		// setup add session button
 		addSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(ChallengeDetailsActivity.this, RecordingActivity.class);
-				intent.putExtra(RecordingActivity.EXTRA_CHALLENGE, challenge);
+				intent.putExtra(RecordingActivity.EXTRA_CHALLENGE, challengeData.getChallenge());
 				startActivity(intent);
 			}
 		});
-	}
-
-
-	@Override
-	public void onGoogleApiClientConnected(GoogleApiClient googleApiClient) {
-		super.onGoogleApiClientConnected(googleApiClient);
-
-		// load completed kms
-		challengeManager.getDistanceInMetersForChallenge(googleApiClient, challenge)
-				.compose(new DefaultTransformer<Float>())
-				.subscribe(new Action1<Float>() {
-					@Override
-					public void call(Float completedDistanceInMeters) {
-						float completedPercentage = completedDistanceInMeters / challenge.getDistanceInMeters();
-						completedDistanceTextView.setText(getString(
-								R.string.km_and_percentage_completed,
-								String.format("%.1f", completedDistanceInMeters / 1000),
-								String.format("%.2f", completedPercentage)));
-					}
-				});
-
-		// load running time
-		challengeManager.getTotalTimeInSeconds(googleApiClient, challenge)
-				.compose(new DefaultTransformer<Long>())
-				.subscribe(new Action1<Long>() {
-					@Override
-					public void call(Long totalTimeInSeconds) {
-						float hours = totalTimeInSeconds / (60.0f * 60.0f);
-						timeTextView.setText(getString(R.string.hours_of_running, String.format("%.1f", hours)));
-					}
-				});
-
-		// load recent activities
-		challengeManager.getSessionsForChallenge(googleApiClient, challenge)
-				.compose(new DefaultTransformer<List<SessionData>>())
-				.subscribe(new Action1<List<SessionData>>() {
-					@Override
-					public void call(List<SessionData> sessions) {
-						List<SessionData> newestSessions = new ArrayList<>();
-						int endIdx = sessions.size() - 1;
-						while (endIdx >= 0 && (sessions.size() - endIdx) <= 3) {
-							newestSessions.add(sessions.get(endIdx));
-							--endIdx;
-						}
-						recentActivitiesAdapter.clear();
-						recentActivitiesAdapter.addAll(newestSessions);
-						recentActivitiesAdapter.notifyDataSetChanged();
-					}
-				});
 	}
 
 

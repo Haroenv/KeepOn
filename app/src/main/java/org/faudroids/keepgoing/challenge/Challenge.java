@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 @Table(databaseName = KeepGoingDatabase.NAME)
-public class Challenge extends BaseModel implements Parcelable {
+public class Challenge extends BaseModel implements Parcelable, Comparable<Challenge> {
 
     @Column
     @PrimaryKey(autoincrement = true)
@@ -190,4 +190,10 @@ public class Challenge extends BaseModel implements Parcelable {
             return new Challenge[size];
         }
     };
+
+	@Override
+	public int compareTo(Challenge another) {
+		return name.compareTo(another.name);
+	}
+
 }

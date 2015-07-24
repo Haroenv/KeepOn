@@ -29,7 +29,7 @@ import rx.functions.Action1;
 @ContentView(R.layout.activity_recording)
 public class RecordingActivity extends AbstractMapActivity {
 
-	public static final String EXTRA_CHALLENGE = "EXTRA_CHALLENGE";
+	public static final String EXTRA_CHALLENGE = "EXTRA_CHALLENGE_DATA";
 
 	@InjectView(R.id.map) private MapView mapView;
 	@InjectView(R.id.txt_duration) private TextView durationTextView;
