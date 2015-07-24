@@ -22,4 +22,5 @@
     <string name="duration">Duration</string>
     <string name="distance_in_km">Distance (km)</string>
     <string name="avg_speed_in_kmh">Avg. Speed (km/h)</string>
+    <string name="x_km_in_y_hours">%1$s km in %2$s hours</string>
 </resources>

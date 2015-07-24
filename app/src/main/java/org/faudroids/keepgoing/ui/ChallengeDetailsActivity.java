@@ -141,9 +141,19 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 			TextView dateTextView = (TextView) itemView.findViewById(R.id.txt_date);
 
 			// populate views
-			SessionOverview overview = getItem(position);
+			final SessionOverview overview = getItem(position);
 			distanceTextView.setText(getString(R.string.distance_km, String.format("%.2f", overview.getTotalDistanceInMeters()  / 1000)));
 			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(overview.getSession().getStartTime(TimeUnit.MILLISECONDS))));
+
+			// on click forward to session details
+			itemView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(ChallengeDetailsActivity.this, SessionDetailsActivity.class);
+					intent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, overview.getSession().getIdentifier());
+					startActivity(intent);
+				}
+			});
 
 			return itemView;
 		}
