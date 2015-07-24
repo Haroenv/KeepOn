@@ -58,7 +58,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		challenge = getIntent().getParcelableExtra(EXTRA_CHALLENGE);
 		nameTextView.setText(challenge.getName());
 		imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getPackageName()));
-		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance() / 1000)));
+		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistanceInMeters() / 1000)));
 
 		// setup recent activities
 		recentActivitiesAdapter = new ActivitiesArrayAdapter(this);
@@ -86,7 +86,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 				.subscribe(new Action1<Float>() {
 					@Override
 					public void call(Float completedDistanceInMeters) {
-						float completedPercentage = completedDistanceInMeters / challenge.getDistance();
+						float completedPercentage = completedDistanceInMeters / challenge.getDistanceInMeters();
 						completedDistanceTextView.setText(getString(
 								R.string.km_and_percentage_completed,
 								String.format("%.1f", completedDistanceInMeters / 1000),

@@ -114,7 +114,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 		public void setData(final Challenge challenge, GoogleApiClient googleApiClient) {
 			// setup view content
 			nameTextView.setText(challenge.getName());
-			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistance() / 1000)));
+			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challenge.getDistanceInMeters() / 1000)));
 			imageView.setImageResource(getResources().getIdentifier(challenge.getImageName(), "drawable", getActivity().getPackageName()));
 
 			// set completed info
@@ -123,7 +123,7 @@ public class OpenChallengesFragment extends AbstractFragment {
 					.subscribe(new Action1<Float>() {
 						@Override
 						public void call(Float completedDistanceInMeters) {
-							float completedPercentage = completedDistanceInMeters / challenge.getDistance();
+							float completedPercentage = completedDistanceInMeters / challenge.getDistanceInMeters();
 							completedTextView.setText(getString(R.string.percentage_completed, String.format("%.2f", completedPercentage)));
 						}
 					});
