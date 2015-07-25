@@ -10,4 +10,6 @@
     <dimen name="map_bounds_padding">15dp</dimen>
 
     <dimen name="list_padding_bottom">128dp</dimen>
+
+    <dimen name="user_photo_size">64dp</dimen>
 </resources>

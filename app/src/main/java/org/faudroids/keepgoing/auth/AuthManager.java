@@ -1,5 +1,7 @@
 package org.faudroids.keepgoing.auth;
 
+import android.net.Uri;
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
@@ -30,8 +32,9 @@ public class AuthManager {
 	public void signIn(GoogleApiClient googleApiClient) {
 		Person person = Plus.PeopleApi.getCurrentPerson(googleApiClient);
 		namePref.set(person.getDisplayName());
-		imageUrlPref.set(person.getImage().getUrl());
-
+		// remove sz query param from image url
+		String imageUrl = Uri.parse(person.getImage().getUrl()).buildUpon().clearQuery().build().toString();
+		imageUrlPref.set(imageUrl);
 		String email = Plus.AccountApi.getAccountName(googleApiClient);
 		emailPref.set(email);
 	}
