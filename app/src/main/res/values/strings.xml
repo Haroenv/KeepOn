@@ -8,11 +8,6 @@
 
     <string name="section_demo">Demo</string>
 
-    <string name="feedback">Feedback</string>
-    <string name="feedback_mail_chooser">Thanks for the feedback!</string>
-    <string name="feedback_mail_address">ideas@faudroids.org</string>
-    <string name="feedback_mail_subject">Feedback TODO</string>
-
     <string name="open_challenges">Open challenges</string>
     <string name="finished_challenges">Finished challenges</string>
     <string name="distance_km">%1$s km</string>
@@ -24,4 +19,48 @@
     <string name="distance_in_km">Distance (km)</string>
     <string name="avg_speed_in_kmh">Avg. Speed (km/h)</string>
     <string name="x_km_in_y_hours">%1$s km in %2$s hours</string>
+
+    <string name="settings">Settings</string>
+    <string name="version">Version</string>
+    <string name="about">About</string>
+    <string name="about_msg">
+        This app was developed as part of the Android Challenge: one app every month for one year
+        (think of it as a New Year\'s resolution). KeepGoing is our project for July.&lt;br/&gt;
+        &lt;br/&gt;
+        If you want to know more, be sure to check out our &lt;a href=&quot;http://faudroids.org&quot;&gt;website&lt;/a&gt;.
+        This app is &lt;b&gt;open source&lt;/b&gt; and you can find everything on &lt;a href=&quot;https://github.com/FauDroids/KeepGoing&quot;&gt;GitHub&lt;/a&gt;.&lt;br/&gt;
+        &lt;br/&gt;
+        We would love to hear from you! Send us an &lt;a href=&quot;mailto:ideas@faudroids.org&quot;&gt;email&lt;/a&gt; and let us know what you think!&lt;br/&gt;
+        &lt;br/&gt;
+        Happy coding!
+    </string>
+    <string name="credits">Credits</string>
+    <string name="credits_msg">
+        This app is being powered by a number of small and large &lt;b&gt;open source projects&lt;/b&gt;,
+        which all together have made this project happen. We couldn\'t have done this without them.
+        To those fellow developers out there spending their part time creating those libraries:
+        you guys are awesome, keep on rocking!&lt;br&gt;
+        &lt;br&gt;
+        The libraries in use are:&lt;br&gt;
+        &lt;br&gt;
+        &lt;a href=&quot;https://github.com/JakeWharton/timber&quot;&gt;Timber&lt;/a&gt; by Jake Wharton&lt;br&gt;
+        &lt;a href=&quot;https://github.com/roboguice/roboguice&quot;&gt;RoboGuice&lt;/a&gt;&lt;br&gt;
+        &lt;a href=&quot;https://github.com/neokree/GoogleNavigationDrawer&quot;&gt;GoogleNavigationDrawer&lt;/a&gt; by Neokree&lt;br&gt;
+        &lt;a href=&quot;https://github.com/square/retrofit&quot;&gt;Retrofit&lt;/a&gt; by Square&lt;br&gt;
+        &lt;a href=&quot;https://github.com/square/picasso&quot;&gt;Picasso&lt;/a&gt; by Square&lt;br&gt;
+        &lt;a href=&quot;https://github.com/ReactiveX/RxJava&quot;&gt;RxJava&lt;/a&gt; by Reactivex&lt;br&gt;
+        &lt;a href=&quot;https://github.com/ReactiveX/RxAndroid&quot;&gt;RxAndroid&lt;/a&gt; by Reactivex&lt;br&gt;
+        &lt;a href=&quot;https://github.com/futuresimple/android-floating-action-button&quot;&gt;Floating Action Button&lt;/a&gt; by futuresimple&lt;br&gt;
+        &lt;a href=&quot;https://github.com/google/material-design-icons&quot;&gt;Material Design Icons&lt;/a&gt; by Google Inc.&lt;br&gt;
+        &lt;a href=&quot;https://source.android.com/&quot;&gt;Android Open Source Project&lt;/a&gt; by Google Inc. and the Open Handset Alliance&lt;br&gt;
+        &lt;br&gt;
+        Thanks everyone!
+    </string>
+    <string name="logout">Logout</string>
+    <string name="settings_quick_message">Made by a small team of night time coders in Erlangen, Germany\nThanks for your support!</string>
+
+    <string name="feedback">Feedback</string>
+    <string name="feedback_mail_chooser">Thanks for the feedback!</string>
+    <string name="feedback_mail_address">ideas@faudroids.org</string>
+    <string name="feedback_mail_subject">Feedback TODO</string>
 </resources>

@@ -43,6 +43,9 @@ public class MainDrawerActivity extends AbstractRoboDrawerActivity implements Ta
 				.resize((int) getResources().getDimension(R.dimen.user_photo_drawer_size), (int) getResources().getDimension(R.dimen.user_photo_drawer_size))
 				.into(this);
 
+		// setup settings
+		addBottomSection(newSection(getString(R.string.settings), R.drawable.ic_settings, new SettingsFragment()));
+
 		// setup feedback
 		String address = getString(R.string.feedback_mail_address);
 		String subject = getString(
@@ -51,7 +54,7 @@ public class MainDrawerActivity extends AbstractRoboDrawerActivity implements Ta
 		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", address, null));
 		intent.putExtra(Intent.EXTRA_SUBJECT, subject);
 		Intent mailer = Intent.createChooser(intent, getString(R.string.feedback_mail_chooser));
-		this.addBottomSection(newSection(getString(R.string.feedback), R.drawable.ic_email, mailer));
+		addBottomSection(newSection(getString(R.string.feedback), R.drawable.ic_email, mailer));
 	}
 
 
