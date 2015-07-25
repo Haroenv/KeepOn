@@ -50,7 +50,6 @@ public class RecordingManager {
 
 	@Inject
 	RecordingManager(Context context, SessionManager sessionManager) {
-		Toast.makeText(context, "Creating RecordingManager", Toast.LENGTH_LONG).show();
 		this.context = context;
 		this.sessionManager = sessionManager;
 

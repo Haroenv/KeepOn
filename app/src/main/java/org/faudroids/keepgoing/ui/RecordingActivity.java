@@ -1,6 +1,12 @@
 package org.faudroids.keepgoing.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -38,11 +44,21 @@ public class RecordingActivity extends AbstractMapActivity {
 	@InjectView(R.id.btn_start_recording) private Button startRecordingButton;
 
 	@Inject private RecordingManager recordingManager;
+	@Inject private LocationManager locationManager;
 	private final RecordingListener dataListener = new RecordingListener();
+
 	private final TimeUpdateRunnable timeUpdateRunnable = new TimeUpdateRunnable();
 
 	public RecordingActivity() {
 		super(true);
+	}
+
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		if (!isGpsEnabled()) showEnableGpsDialog();
 	}
 
 
@@ -118,6 +134,28 @@ public class RecordingActivity extends AbstractMapActivity {
 	public void onPause() {
 		recordingManager.unregisterRecordingListener();
 		super.onPause();
+	}
+
+
+	private boolean isGpsEnabled() {
+		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+	}
+
+
+	private void showEnableGpsDialog() {
+		new AlertDialog
+				.Builder(this)
+				.setMessage(R.string.gps_disabled_prompt)
+				.setCancelable(false)
+				.setPositiveButton(R.string.enable_gps, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent callGPSSettingIntent = new Intent(
+								Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+						startActivity(callGPSSettingIntent);
+					}
+				})
+				.setNegativeButton(android.R.string.cancel, null)
+				.show();
 	}
 
 

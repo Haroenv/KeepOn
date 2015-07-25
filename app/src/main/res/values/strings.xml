@@ -20,6 +20,9 @@
     <string name="avg_speed_in_kmh">Avg. Speed (km/h)</string>
     <string name="x_km_in_y_hours">%1$s km in %2$s hours</string>
 
+    <string name="gps_disabled_prompt">GPS is disabled. Enable it?</string>
+    <string name="enable_gps">Enable</string>
+
     <string name="settings">Settings</string>
     <string name="version">Version</string>
     <string name="about">About</string>
