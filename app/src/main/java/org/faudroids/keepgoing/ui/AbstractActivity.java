@@ -19,14 +19,14 @@ import org.roboguice.shaded.goole.common.base.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
-import roboguice.activity.RoboActivity;
+import roboguice.activity.RoboActionBarActivity;
 
 
 /**
  * Manages a connection to the {@link GoogleApiClientService} and forwards connection status
  * changes of the {@link GoogleApiClient}.
  */
-abstract class AbstractActivity extends RoboActivity implements ServiceConnection, GoogleApiClientListener, GoogleApiClientObserver {
+abstract class AbstractActivity extends RoboActionBarActivity implements ServiceConnection, GoogleApiClientListener, GoogleApiClientObserver {
 
 	private GoogleApiClientService apiClientService = null;
 

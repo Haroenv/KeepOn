@@ -1,13 +1,27 @@
 package org.faudroids.keepgoing.ui;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
+import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.auth.Account;
@@ -15,73 +29,127 @@ import org.faudroids.keepgoing.auth.AuthManager;
 
 import javax.inject.Inject;
 
-import it.neokree.materialnavigationdrawer.elements.MaterialAccount;
-import timber.log.Timber;
+import roboguice.inject.ContentView;
+import roboguice.inject.InjectView;
 
 
-public class MainDrawerActivity extends AbstractRoboDrawerActivity implements Target {
+@ContentView(R.layout.activity_main)
+public class MainDrawerActivity extends AbstractActivity implements Drawer.OnDrawerItemClickListener {
+
+	private static final int
+			ID_OPEN_CHALLENGES = 0,
+			ID_FINISHED_CHALLENGES = 1,
+			ID_SETTINGS = 2,
+			ID_FEEDBACK = 3;
 
 	@Inject private AuthManager authManager;
+	@InjectView(R.id.toolbar) private Toolbar toolbar;
+	private Drawer drawer;
+	private int visibleFragmentId;
+
 
 	@Override
-	public void init(Bundle savedInstanceState) {
-		// setup sections
-		addSection(newSection(getString(R.string.section_demo), new MainFragment()));
-		addSection(newSection(getString(R.string.open_challenges), new OpenChallengesFragment()));
-		addSection(newSection(getString(R.string.finished_challenges), new FinishedChallengesFragment()));
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-		// setup account
+		// setup toolbar
+		setSupportActionBar(toolbar);
+
+		// show first fragment
+		showFragment(new OpenChallengesFragment(), false);
+		visibleFragmentId = ID_OPEN_CHALLENGES;
+
+		// setup image loading for nav drawer
+		DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
+			@Override
+			public void set(ImageView imageView, Uri uri, Drawable drawable) {
+				Picasso.with(imageView.getContext()).load(uri).into(imageView);
+			}
+
+			@Override
+			public void cancel(ImageView imageView) {
+				Picasso.with(imageView.getContext()).cancelRequest(imageView);
+			}
+
+			@Override
+			public Drawable placeholder(Context context) {
+				return null;
+			}
+		});
+
+		// setup account in nav drawer
 		Account account = authManager.getAccount();
-		addAccount(new MaterialAccount(
-				getResources(),
-				account.getName(),
-				account.getEmail(),
-				null,
-				null));
-		Picasso.with(this)
-				.load(account.getImageUrl())
-				.resize((int) getResources().getDimension(R.dimen.user_photo_drawer_size), (int) getResources().getDimension(R.dimen.user_photo_drawer_size))
-				.into(this);
+		AccountHeader accountHeader = new AccountHeaderBuilder()
+				.withActivity(this)
+				.addProfiles(
+						new ProfileDrawerItem().withName(account.getName()).withEmail(account.getEmail()).withIcon(account.getImageUrl())
+				)
+				.withProfileImagesClickable(false)
+				.withSelectionListEnabledForSingleProfile(false)
+				.build();
 
-		// setup settings
-		addBottomSection(newSection(getString(R.string.settings), R.drawable.ic_settings, new SettingsFragment()));
+		// setup actual nav drawer
+		drawer = new DrawerBuilder()
+				.withActivity(this)
+				.withToolbar(toolbar)
+				.withAccountHeader(accountHeader)
+				.addDrawerItems(
+						new PrimaryDrawerItem().withName(R.string.open_challenges).withIdentifier(ID_OPEN_CHALLENGES),
+						new PrimaryDrawerItem().withName(R.string.finished_challenges).withIdentifier(ID_FINISHED_CHALLENGES)
+				)
+				.addStickyDrawerItems(
+						new PrimaryDrawerItem().withName(R.string.settings).withIcon(R.drawable.ic_settings).withIdentifier(ID_SETTINGS),
+						new PrimaryDrawerItem().withName(R.string.feedback).withIcon(R.drawable.ic_email).withIdentifier(ID_FEEDBACK)
+				)
+				.withOnDrawerItemClickListener(this)
+				.build();
+	}
 
-		// setup feedback
-		String address = getString(R.string.feedback_mail_address);
-		String subject = getString(
-				R.string.feedback_mail_subject,
-				getString(R.string.app_name));
-		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", address, null));
-		intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-		Intent mailer = Intent.createChooser(intent, getString(R.string.feedback_mail_chooser));
-		addBottomSection(newSection(getString(R.string.feedback), R.drawable.ic_email, mailer));
+
+	private void showFragment(Fragment fragment, boolean replace) {
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		if (!replace) transaction.add(R.id.container, fragment);
+		else transaction.replace(R.id.container, fragment);
+		transaction.addToBackStack("").commit();
 	}
 
 
 	@Override
-	public void onDestroy() {
-		Picasso.with(this).cancelRequest(this);
-		super.onDestroy();
-	}
+	public boolean onItemClick(AdapterView<?> adapterView, View view, int position, long id, IDrawerItem item) {
+		drawer.closeDrawer();
+		if (item.getIdentifier() == visibleFragmentId) return false;
 
+		switch (item.getIdentifier()) {
+			case ID_FEEDBACK:
+				String address = getString(R.string.feedback_mail_address);
+				String subject = getString(
+						R.string.feedback_mail_subject,
+						getString(R.string.app_name));
+				Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", address, null));
+				intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+				Intent mailer = Intent.createChooser(intent, getString(R.string.feedback_mail_chooser));
+				startActivity(mailer);
+				return false;
 
-	@Override
-	public void onBitmapLoaded(Bitmap profileBitmap, Picasso.LoadedFrom from) {
-		MaterialAccount account = getCurrentAccount();
-		account.setPhoto(profileBitmap);
-		notifyAccountDataChanged();
-	}
+			case ID_OPEN_CHALLENGES:
+				showFragment(new OpenChallengesFragment(), true);
+				break;
 
+			case ID_FINISHED_CHALLENGES:
+				showFragment(new FinishedChallengesFragment(), true);
+				break;
 
-	@Override
-	public void onBitmapFailed(Drawable errorDrawable) {
-		Timber.e("failed to load profile img");
-	}
+			case ID_SETTINGS:
+				showFragment(new SettingsFragment(), true);
+				break;
 
+			default:
+				return false;
+		}
 
-	@Override
-	public void onPrepareLoad(Drawable placeHolderDrawable) {
-		// nothing to do
+		visibleFragmentId = item.getIdentifier();
+		return true;
 	}
 
 }
