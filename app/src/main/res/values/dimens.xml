@@ -11,5 +11,6 @@
 
     <dimen name="list_padding_bottom">128dp</dimen>
 
-    <dimen name="user_photo_size">64dp</dimen>
+    <dimen name="user_photo_drawer_size">64dp</dimen>
+    <dimen name="user_photo_challenge_size">80dp</dimen>
 </resources>

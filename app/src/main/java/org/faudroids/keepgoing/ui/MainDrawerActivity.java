@@ -40,7 +40,7 @@ public class MainDrawerActivity extends AbstractRoboDrawerActivity implements Ta
 				null));
 		Picasso.with(this)
 				.load(account.getImageUrl())
-				.resize((int) getResources().getDimension(R.dimen.user_photo_size), (int) getResources().getDimension(R.dimen.user_photo_size))
+				.resize((int) getResources().getDimension(R.dimen.user_photo_drawer_size), (int) getResources().getDimension(R.dimen.user_photo_drawer_size))
 				.into(this);
 
 		// setup feedback

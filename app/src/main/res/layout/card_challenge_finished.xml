@@ -16,9 +16,25 @@
         <ImageView
             android:id="@+id/img_challenge"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="150dp"
             android:scaleType="centerCrop"
             android:src="@drawable/challenge_great_wall_of_china"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="18dp"
+            android:src="@drawable/laurels"
+            />
+
+        <ImageView
+            android:id="@+id/img_profile"
+            android:layout_width="@dimen/user_photo_challenge_size"
+            android:layout_height="@dimen/user_photo_challenge_size"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="22dp"
             />
 
         <LinearLayout
