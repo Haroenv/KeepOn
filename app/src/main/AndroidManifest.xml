@@ -52,6 +52,7 @@
         <activity
             android:name=".ui.ChallengeDetailsActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionbar"
             />
         <service
             android:name=".googleapi.GoogleApiClientService"

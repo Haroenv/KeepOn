@@ -7,6 +7,13 @@
         <item name="colorControlActivated">@color/blue</item>
     </style>
 
+    <style name="AppThemeNoActionbar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorAccent">@android:color/white</item>
+        <item name="colorControlActivated">@color/blue</item>
+    </style>
+
     <style name="DrawerTheme" parent="MaterialDrawerTheme.Light.DarkToolbar">
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green_dark</item>
@@ -32,6 +39,11 @@
     <style name="FontHeader">
         <item name="android:textColor">@color/green</item>
         <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="FontToolbarHeader">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">30sp</item>
     </style>
 
     <style name="CardStyle">
