@@ -126,6 +126,9 @@ public class RecordingActivity extends AbstractMapActivity {
 
 		} else {
 			startRecordingButton.setText(R.string.start_recording);
+
+			// if something has been recorded to not clear screen
+			if (recordingFinished) return;
 			durationTextView.setText("00:00:00");
 			distanceTextView.setText("0.00");
 			avgSpeedTextView.setText("0.00");
