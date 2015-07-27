@@ -3,6 +3,8 @@ package org.faudroids.keepgoing.challenge;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.raizlabs.android.dbflow.runtime.TransactionManager;
 import com.raizlabs.android.dbflow.runtime.transaction.SelectListTransaction;
+import com.raizlabs.android.dbflow.runtime.transaction.SelectSingleModelTransaction;
+import com.raizlabs.android.dbflow.sql.builder.Condition;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import org.faudroids.keepgoing.database.TransactionListenerAdapter;
@@ -62,23 +64,50 @@ public class ChallengeManager {
 				.flatMap(new Func1<Challenge, Observable<ChallengeData>>() {
 					@Override
 					public Observable<ChallengeData> call(final Challenge challenge) {
-						return Observable.from(challenge.getSessionIdList())
-								.flatMap(new Func1<String, Observable<SessionData>>() {
-									@Override
-									public Observable<SessionData> call(String sessionId) {
-										return sessionManager.loadSessionData(googleApiClient, sessionId);
-									}
-								})
-								.toSortedList()
-								.map(new Func1<List<SessionData>, ChallengeData>() {
-									@Override
-									public ChallengeData call(List<SessionData> sessionDataList) {
-										return new ChallengeData(challenge, sessionDataList);
-									}
-								});
+						return challengeToChallengeData(googleApiClient, challenge);
 					}
 				})
 				.toSortedList();
+	}
+
+
+	public Observable<ChallengeData> getChallenge(final GoogleApiClient googleApiClient, final long id) {
+		return Observable
+				.defer(new Func0<Observable<Challenge>>() {
+					@Override
+					public Observable<Challenge> call() {
+						TransactionListenerAdapter<Challenge> adapter = new TransactionListenerAdapter<>();
+						transactionManager.addTransaction(new SelectSingleModelTransaction<>(
+								Challenge.class,
+								adapter,
+								Condition.column(Challenge$Table.ID).is(id)));
+						return adapter.toObservable();
+					}
+				})
+				.flatMap(new Func1<Challenge, Observable<ChallengeData>>() {
+					@Override
+					public Observable<ChallengeData> call(final Challenge challenge) {
+						return challengeToChallengeData(googleApiClient, challenge);
+					}
+				});
+	}
+
+
+	private Observable<ChallengeData> challengeToChallengeData(final GoogleApiClient googleApiClient, final Challenge challenge) {
+		return Observable.from(challenge.getSessionIdList())
+				.flatMap(new Func1<String, Observable<SessionData>>() {
+					@Override
+					public Observable<SessionData> call(String sessionId) {
+						return sessionManager.loadSessionData(googleApiClient, sessionId);
+					}
+				})
+				.toSortedList()
+				.map(new Func1<List<SessionData>, ChallengeData>() {
+					@Override
+					public ChallengeData call(List<SessionData> sessionDataList) {
+						return new ChallengeData(challenge, sessionDataList);
+					}
+				});
 	}
 
 

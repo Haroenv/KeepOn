@@ -37,6 +37,8 @@ public class RecordingActivity extends AbstractMapActivity {
 
 	public static final String EXTRA_CHALLENGE = "EXTRA_CHALLENGE_DATA";
 
+	private static final String STATE_RECORDING_FINISHED = "STATE_RECORDING_FINISHED";
+
 	@InjectView(R.id.map) private MapView mapView;
 	@InjectView(R.id.txt_duration) private TextView durationTextView;
 	@InjectView(R.id.txt_distance) private TextView distanceTextView;
@@ -46,6 +48,8 @@ public class RecordingActivity extends AbstractMapActivity {
 	@Inject private RecordingManager recordingManager;
 	@Inject private LocationManager locationManager;
 	private final RecordingListener dataListener = new RecordingListener();
+
+	private boolean recordingFinished = false; // true if one or more recordings have been finished since starting this activity
 
 	private final TimeUpdateRunnable timeUpdateRunnable = new TimeUpdateRunnable();
 
@@ -58,7 +62,13 @@ public class RecordingActivity extends AbstractMapActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		// check for GPS
 		if (!isGpsEnabled()) showEnableGpsDialog();
+
+		// restore state
+		if (savedInstanceState != null) {
+			recordingFinished = savedInstanceState.getBoolean(STATE_RECORDING_FINISHED);
+		}
 	}
 
 
@@ -89,6 +99,7 @@ public class RecordingActivity extends AbstractMapActivity {
 				} else {
 					// stop recording
 					timeUpdateRunnable.stop();
+					recordingFinished = true;
 					recordingManager
 							.stopAndSaveRecording(googleApiClient)
 							.compose(new DefaultTransformer<RecordingResult>())
@@ -134,6 +145,21 @@ public class RecordingActivity extends AbstractMapActivity {
 	public void onPause() {
 		recordingManager.unregisterRecordingListener();
 		super.onPause();
+	}
+
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean(STATE_RECORDING_FINISHED, recordingFinished);
+		super.onSaveInstanceState(outState);
+	}
+
+
+	@Override
+	public void onBackPressed() {
+		if (recordingFinished) setResult(RESULT_OK);
+		else setResult(RESULT_CANCELED);
+		super.onBackPressed();
 	}
 
 

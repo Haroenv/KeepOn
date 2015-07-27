@@ -17,6 +17,7 @@ import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.challenge.ChallengeData;
 import org.faudroids.keepgoing.challenge.ChallengeManager;
 import org.faudroids.keepgoing.sessions.SessionData;
+import org.faudroids.keepgoing.utils.DefaultTransformer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,12 +29,15 @@ import javax.inject.Inject;
 
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
+import rx.functions.Action1;
 
 
 @ContentView(R.layout.activity_challenge_details)
 public class ChallengeDetailsActivity extends AbstractActivity {
 
 	public static final String EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA";
+
+	private static final int REQUEST_START_RECORDING = 42;
 
 	@InjectView(R.id.txt_name) private TextView nameTextView;
 	@InjectView(R.id.img_challenge) private ImageView imageView;
@@ -57,6 +61,44 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		imageView.setImageResource(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getPackageName()));
 		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
 
+		// setup add session button
+		addSessionButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ChallengeDetailsActivity.this, RecordingActivity.class);
+				intent.putExtra(RecordingActivity.EXTRA_CHALLENGE, challengeData.getChallenge());
+				startActivityForResult(intent, REQUEST_START_RECORDING);
+			}
+		});
+
+		// setup progress
+		recentActivitiesAdapter = new ActivitiesArrayAdapter(this);
+		recentActivitiesList.setAdapter(recentActivitiesAdapter);
+		setupChallengeProgress();
+	}
+
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case REQUEST_START_RECORDING:
+				if (resultCode != RESULT_OK) break;
+				// reload challenge
+				challengeManager.getChallenge(getGoogleApiClient(), challengeData.getChallenge().getId())
+						.compose(new DefaultTransformer<ChallengeData>())
+						.subscribe(new Action1<ChallengeData>() {
+							@Override
+							public void call(ChallengeData challengeData) {
+								ChallengeDetailsActivity.this.challengeData = challengeData;
+								setupChallengeProgress();
+							}
+						});
+				break;
+		}
+	}
+
+
+	private void setupChallengeProgress() {
 		// set completed kms
 		float completedPercentage = challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters();
 		completedDistanceTextView.setText(getString(
@@ -69,8 +111,6 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		timeTextView.setText(getString(R.string.hours_of_running, String.format("%.1f", hours)));
 
 		// setup recent activities
-		recentActivitiesAdapter = new ActivitiesArrayAdapter(this);
-		recentActivitiesList.setAdapter(recentActivitiesAdapter);
 		List<SessionData> newestSessions = new ArrayList<>();
 		int endIdx = challengeData.getSessionDataList().size() - 1;
 		while (endIdx >= 0 && (challengeData.getSessionDataList().size() - endIdx) <= 3) {
@@ -80,16 +120,6 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		recentActivitiesAdapter.clear();
 		recentActivitiesAdapter.addAll(newestSessions);
 		recentActivitiesAdapter.notifyDataSetChanged();
-
-		// setup add session button
-		addSessionButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(ChallengeDetailsActivity.this, RecordingActivity.class);
-				intent.putExtra(RecordingActivity.EXTRA_CHALLENGE, challengeData.getChallenge());
-				startActivity(intent);
-			}
-		});
 	}
 
 

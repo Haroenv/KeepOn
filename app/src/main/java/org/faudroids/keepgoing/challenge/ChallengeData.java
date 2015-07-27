@@ -28,6 +28,10 @@ public class ChallengeData implements Parcelable, Comparable<ChallengeData> {
 		return sessionDataList;
 	}
 
+	public void addSessionData(SessionData sessionData) {
+		this.sessionDataList.add(sessionData);
+	}
+
 	public float getCompletedDistanceInMeters() {
 		float distance = 0;
 		for (SessionData sessionData : sessionDataList) {
