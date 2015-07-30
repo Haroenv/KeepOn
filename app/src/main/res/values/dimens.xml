@@ -13,4 +13,7 @@
 
     <dimen name="user_photo_drawer_size">64dp</dimen>
     <dimen name="user_photo_challenge_size">80dp</dimen>
+
+    <dimen name="one_dp">1dp</dimen>
+    <dimen name="recent_activities_margin">15dp</dimen>
 </resources>

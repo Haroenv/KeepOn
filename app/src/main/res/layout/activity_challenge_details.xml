@@ -121,7 +121,6 @@
 
             </android.support.v7.widget.CardView>
 
-
             <android.support.v7.widget.CardView
                 style="@style/CardStyle"
                 android:layout_width="match_parent"
@@ -145,13 +144,11 @@
 
                     <include layout="@layout/separator"/>
 
-                    <org.faudroids.keepgoing.ui.ExpandedListView
-                        android:id="@+id/list_recent_activities"
+                    <LinearLayout
+                        android:id="@+id/layout_recent_activities"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:divider="@drawable/separator_padded"
-                        android:dividerHeight="1dp"
-                        android:overScrollMode="never"
+                        android:orientation="vertical"
                         />
 
                 </LinearLayout>

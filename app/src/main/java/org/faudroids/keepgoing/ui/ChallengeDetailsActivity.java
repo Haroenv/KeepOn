@@ -7,9 +7,8 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -46,9 +45,8 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@InjectView(R.id.txt_distance) private TextView distanceTextView;
 	@InjectView(R.id.txt_distance_completed) private TextView completedDistanceTextView;
 	@InjectView(R.id.txt_time) private TextView timeTextView;
-	@InjectView(R.id.list_recent_activities) private ListView recentActivitiesList;
 	@InjectView(R.id.btn_add_session) private FloatingActionButton addSessionButton;
-	private ArrayAdapter<SessionData> recentActivitiesAdapter;
+	@InjectView(R.id.layout_recent_activities) private LinearLayout recentActivitesLayout;
 
 	@Inject private ChallengeManager challengeManager;
 	private ChallengeData challengeData;
@@ -85,8 +83,6 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		});
 
 		// setup progress
-		recentActivitiesAdapter = new ActivitiesArrayAdapter(this);
-		recentActivitiesList.setAdapter(recentActivitiesAdapter);
 		setupChallengeProgress();
 	}
 
@@ -123,51 +119,66 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		float hours = challengeData.getCompletedTimeInSeconds() / (60.0f * 60.0f);
 		timeTextView.setText(getString(R.string.hours_of_running, String.format("%.1f", hours)));
 
-		// setup recent activities
+		// get recent activities
 		List<SessionData> newestSessions = new ArrayList<>();
 		int endIdx = challengeData.getSessionDataList().size() - 1;
 		while (endIdx >= 0 && (challengeData.getSessionDataList().size() - endIdx) <= 3) {
 			newestSessions.add(challengeData.getSessionDataList().get(endIdx));
 			--endIdx;
 		}
-		recentActivitiesAdapter.clear();
-		recentActivitiesAdapter.addAll(newestSessions);
-		recentActivitiesAdapter.notifyDataSetChanged();
+
+		// create views
+		recentActivitesLayout.removeAllViews();
+		boolean firstIter = true;
+		for (SessionData session : newestSessions) {
+			// add separator
+			if (!firstIter) {
+				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+						ViewGroup.LayoutParams.MATCH_PARENT,
+						getResources().getDimensionPixelSize(R.dimen.one_dp));
+				int margin = getResources().getDimensionPixelSize(R.dimen.recent_activities_margin);
+				layoutParams.setMargins(margin, 0, 0, 0);
+				recentActivitesLayout.addView(createSeparatorView(recentActivitesLayout), layoutParams);
+			}
+			if (firstIter) firstIter = false;
+
+			// add activity view
+			recentActivitesLayout.addView(
+					createRecentActivityView(recentActivitesLayout, session),
+					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		}
 	}
 
 
-	private class ActivitiesArrayAdapter extends ArrayAdapter<SessionData> {
+	private View createRecentActivityView(ViewGroup parent, final SessionData data) {
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		public ActivitiesArrayAdapter(Context context) {
-			super(context, R.layout.item_recent_activity);
-		}
+		// get views
+		View itemView = inflater.inflate(R.layout.item_recent_activity, parent, false);
+		TextView distanceTextView = (TextView) itemView.findViewById(R.id.txt_distance);
+		TextView dateTextView = (TextView) itemView.findViewById(R.id.txt_date);
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		// populate views
+		distanceTextView.setText(getString(R.string.distance_km, String.format("%.2f", data.getDistanceInMeters() / 1000)));
+		dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(data.getSession().getStartTime(TimeUnit.MILLISECONDS))));
 
-			// get views
-			View itemView = inflater.inflate(R.layout.item_recent_activity, parent, false);
-			TextView distanceTextView = (TextView) itemView.findViewById(R.id.txt_distance);
-			TextView dateTextView = (TextView) itemView.findViewById(R.id.txt_date);
+		// on click forward to session details
+		itemView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ChallengeDetailsActivity.this, SessionDetailsActivity.class);
+				intent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, data.getSession().getIdentifier());
+				startActivity(intent);
+			}
+		});
 
-			// populate views
-			final SessionData data = getItem(position);
-			distanceTextView.setText(getString(R.string.distance_km, String.format("%.2f", data.getDistanceInMeters() / 1000)));
-			dateTextView.setText(SimpleDateFormat.getDateInstance().format(new Date(data.getSession().getStartTime(TimeUnit.MILLISECONDS))));
+		return itemView;
+	}
 
-			// on click forward to session details
-			itemView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(ChallengeDetailsActivity.this, SessionDetailsActivity.class);
-					intent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, data.getSession().getIdentifier());
-					startActivity(intent);
-				}
-			});
 
-			return itemView;
-		}
+	private View createSeparatorView(ViewGroup parent) {
+		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		return inflater.inflate(R.layout.separator, parent, false);
 	}
 
 }
