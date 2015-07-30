@@ -27,6 +27,7 @@
             android:padding="15dp"
             android:layout_below="@id/img_challenge"
             android:orientation="vertical"
+            android:background="@drawable/selector_gray"
             >
 
             <TextView
