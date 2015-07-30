@@ -1,5 +1,6 @@
 package org.faudroids.keepgoing.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,13 +27,16 @@ import rx.functions.Func1;
 
 abstract class AbstractChallengesFragment extends AbstractFragment {
 
+	private final int titleResource;
+
 	@InjectView(R.id.list) private RecyclerView recyclerView;
 	private ChallengeAdapter challengeAdapter;
 	@Inject private ChallengeManager challengeManager;
 
 
-	public AbstractChallengesFragment(int layoutResource) {
+	public AbstractChallengesFragment(int layoutResource, int titleResource) {
 		super(layoutResource);
+		this.titleResource = titleResource;
 	}
 
 
@@ -45,6 +49,15 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 		recyclerView.setLayoutManager(layoutManager);
 		challengeAdapter = new ChallengeAdapter();
 		recyclerView.setAdapter(challengeAdapter);
+	}
+
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+
+		// set title
+		activity.setTitle(titleResource);
 	}
 
 

@@ -26,7 +26,7 @@ public class FinishedChallengesFragment extends AbstractChallengesFragment {
 	@Inject private AuthManager authManager;
 
 	public FinishedChallengesFragment() {
-		super(R.layout.fragment_challenge_overview);
+		super(R.layout.fragment_challenge_overview, R.string.finished_challenges);
 	}
 
 
