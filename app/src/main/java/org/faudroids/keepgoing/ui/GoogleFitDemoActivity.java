@@ -43,6 +43,10 @@ public class GoogleFitDemoActivity extends AbstractActivity {
 	@InjectView(R.id.btn_start_sensor) private Button startSensorButton;
 	@InjectView(R.id.btn_stop_sensor) private Button stopSensorButton;
 
+	protected GoogleFitDemoActivity() {
+		super(true);
+	}
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

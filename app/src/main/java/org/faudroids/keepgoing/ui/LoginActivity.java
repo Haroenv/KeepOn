@@ -42,6 +42,11 @@ public class LoginActivity extends AbstractActivity {
 
 	@Inject private AuthManager authManager;
 
+	public LoginActivity() {
+		super(false);
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

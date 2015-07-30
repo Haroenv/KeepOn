@@ -54,7 +54,7 @@ public class RecordingActivity extends AbstractMapActivity {
 	private final TimeUpdateRunnable timeUpdateRunnable = new TimeUpdateRunnable();
 
 	public RecordingActivity() {
-		super(true);
+		super(true, true);
 	}
 
 

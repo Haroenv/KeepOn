@@ -45,6 +45,11 @@ public class MainDrawerActivity extends AbstractActivity implements Drawer.OnDra
 	private int visibleFragmentId;
 
 
+	public MainDrawerActivity() {
+		super(false);
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

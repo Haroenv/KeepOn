@@ -29,7 +29,8 @@ abstract class AbstractMapActivity extends AbstractActivity implements OnMapRead
 	private final boolean showMyLocation;
 	private GoogleMap googleMap = null;
 
-	public AbstractMapActivity(boolean showMyLocation) {
+	public AbstractMapActivity(boolean showBackButton, boolean showMyLocation) {
+		super(showBackButton);
 		this.showMyLocation = showMyLocation;
 	}
 

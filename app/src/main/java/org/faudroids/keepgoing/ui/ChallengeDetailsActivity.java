@@ -53,6 +53,12 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@Inject private ChallengeManager challengeManager;
 	private ChallengeData challengeData;
 
+
+	public ChallengeDetailsActivity() {
+		super(true);
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

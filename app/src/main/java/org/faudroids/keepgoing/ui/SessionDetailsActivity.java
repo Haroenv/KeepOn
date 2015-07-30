@@ -38,7 +38,7 @@ public class SessionDetailsActivity extends AbstractMapActivity {
 	@Inject private SessionManager sessionManager;
 
 	public SessionDetailsActivity() {
-		super(false);
+		super(true, false);
 	}
 
 

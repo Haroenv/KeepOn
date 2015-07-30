@@ -35,6 +35,10 @@ public class SessionsOverviewActivity extends AbstractActivity {
 	private SessionsAdapter sessionsAdapter;
 	@Inject private SessionManager sessionManager;
 
+	public SessionsOverviewActivity() {
+		super(true);
+	}
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -33,6 +34,7 @@ import roboguice.inject.InjectView;
 abstract class AbstractActivity extends RoboActionBarActivity implements ServiceConnection, GoogleApiClientListener, GoogleApiClientObserver {
 
 	@InjectView(R.id.toolbar) protected Toolbar toolbar;
+	private final boolean showBackButton;
 
 	private GoogleApiClientService apiClientService = null;
 
@@ -42,12 +44,33 @@ abstract class AbstractActivity extends RoboActionBarActivity implements Service
 	private ConnectionResult cachedConnectionResult = null;
 
 
+	protected AbstractActivity(boolean showBackButton) {
+		this.showBackButton = showBackButton;
+	}
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// setup toolbar
 		setSupportActionBar(toolbar);
+		if (showBackButton) {
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+			getSupportActionBar().setDisplayShowHomeEnabled(true);
+		}
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				if (!showBackButton) break;
+				onBackPressed();
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 

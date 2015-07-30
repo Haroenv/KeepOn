@@ -17,6 +17,10 @@ public class MapsActivity extends AbstractActivity implements OnMapReadyCallback
 
 	@InjectView(R.id.map) private MapView mapView;
 
+	protected MapsActivity() {
+		super(true);
+	}
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
