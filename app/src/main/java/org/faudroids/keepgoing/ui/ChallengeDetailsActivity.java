@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +41,6 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	private static final int REQUEST_START_RECORDING = 42;
 
 	@InjectView(R.id.img_challenge) private ImageView imageView;
-	@InjectView(R.id.toolbar) private Toolbar toolbar;
 	@InjectView(R.id.collapsing_toolbar) private CollapsingToolbarLayout collapsingToolbarLayout;
 
 	@InjectView(R.id.txt_distance) private TextView distanceTextView;
@@ -62,7 +60,6 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		challengeData = getIntent().getParcelableExtra(EXTRA_CHALLENGE_DATA);
 
 		// setup header
-		setSupportActionBar(toolbar);
 		collapsingToolbarLayout.setTitle(challengeData.getChallenge().getName());
 		collapsingToolbarLayout.setContentScrimColor(getResources().getColor(R.color.green));
 		collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.FontToolbarHeader);

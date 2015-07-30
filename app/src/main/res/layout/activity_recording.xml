@@ -5,10 +5,13 @@
     android:orientation="vertical"
     >
 
+    <include layout="@layout/toolbar" />
+
     <RelativeLayout
         android:id="@+id/container_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
         android:padding="15dp"
         android:background="@android:color/white"
         >

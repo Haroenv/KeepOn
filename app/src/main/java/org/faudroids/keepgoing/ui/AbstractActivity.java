@@ -5,12 +5,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.googleapi.GoogleApiClientListener;
 import org.faudroids.keepgoing.googleapi.GoogleApiClientObserver;
 import org.faudroids.keepgoing.googleapi.GoogleApiClientService;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import roboguice.activity.RoboActionBarActivity;
+import roboguice.inject.InjectView;
 
 
 /**
@@ -28,12 +32,23 @@ import roboguice.activity.RoboActionBarActivity;
  */
 abstract class AbstractActivity extends RoboActionBarActivity implements ServiceConnection, GoogleApiClientListener, GoogleApiClientObserver {
 
+	@InjectView(R.id.toolbar) protected Toolbar toolbar;
+
 	private GoogleApiClientService apiClientService = null;
 
 	private final List<GoogleApiClientListener> listeners = new ArrayList<>();
 	// temp cache for when callbacks come before listeners have registered
 	private GoogleApiClient cachedClient = null;
 	private ConnectionResult cachedConnectionResult = null;
+
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		// setup toolbar
+		setSupportActionBar(toolbar);
+	}
 
 
 	@Override

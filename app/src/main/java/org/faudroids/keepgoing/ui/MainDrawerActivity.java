@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -30,7 +29,6 @@ import org.faudroids.keepgoing.auth.AuthManager;
 import javax.inject.Inject;
 
 import roboguice.inject.ContentView;
-import roboguice.inject.InjectView;
 
 
 @ContentView(R.layout.activity_main)
@@ -43,7 +41,6 @@ public class MainDrawerActivity extends AbstractActivity implements Drawer.OnDra
 			ID_FEEDBACK = 3;
 
 	@Inject private AuthManager authManager;
-	@InjectView(R.id.toolbar) private Toolbar toolbar;
 	private Drawer drawer;
 	private int visibleFragmentId;
 
@@ -51,9 +48,6 @@ public class MainDrawerActivity extends AbstractActivity implements Drawer.OnDra
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// setup toolbar
-		setSupportActionBar(toolbar);
 
 		// show first fragment
 		showFragment(new OpenChallengesFragment(), false);

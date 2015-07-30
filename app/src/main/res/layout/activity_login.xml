@@ -5,6 +5,8 @@
     android:orientation="vertical"
     >
 
+    <include layout="@layout/toolbar" />
+
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btn_sign_in"
         android:layout_width="fill_parent"
