@@ -46,6 +46,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@InjectView(R.id.txt_distance_completed) private TextView completedDistanceTextView;
 	@InjectView(R.id.txt_time) private TextView timeTextView;
 	@InjectView(R.id.btn_add_session) private FloatingActionButton addSessionButton;
+	@InjectView(R.id.txt_recent_activities) private TextView recentActivitiesTextView;
 	@InjectView(R.id.layout_recent_activities) private LinearLayout recentActivitesLayout;
 
 	@Inject private ChallengeManager challengeManager;
@@ -84,6 +85,16 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 
 		// setup progress
 		setupChallengeProgress();
+
+		// setup all recent activities click listener
+		recentActivitiesTextView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ChallengeDetailsActivity.this, AllActivitiesActivity.class);
+				intent.putExtra(AllActivitiesActivity.EXTRA_CHALLENGE_DATA, challengeData);
+				startActivity(intent);
+			}
+		});
 	}
 
 

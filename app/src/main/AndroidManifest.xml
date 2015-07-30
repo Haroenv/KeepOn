@@ -53,6 +53,10 @@
             android:name=".ui.ChallengeDetailsActivity"
             android:screenOrientation="portrait"
             />
+        <activity
+            android:name=".ui.AllActivitiesActivity"
+            android:screenOrientation="portrait"
+            />
         <service
             android:name=".googleapi.GoogleApiClientService"
             android:screenOrientation="portrait"

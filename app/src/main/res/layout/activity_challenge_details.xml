@@ -135,11 +135,13 @@
                     >
 
                     <TextView
-                        style="@style/FontDefault.Green"
+                        android:id="@+id/txt_recent_activities"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="15dp"
+                        android:padding="15dp"
                         android:text="Recent activities"
+                        android:background="@drawable/selector_gray"
+                        style="@style/FontDefault.Green"
                         />
 
                     <include layout="@layout/separator"/>
