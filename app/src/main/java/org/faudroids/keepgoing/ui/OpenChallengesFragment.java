@@ -20,7 +20,7 @@ import rx.functions.Func1;
 public class OpenChallengesFragment extends AbstractChallengesFragment {
 
 	public OpenChallengesFragment() {
-		super(R.layout.fragment_challenge_overview, R.string.open_challenges);
+		super(R.layout.fragment_challenge_overview, R.string.open_challenges, R.string.no_open_challenges);
 	}
 
 

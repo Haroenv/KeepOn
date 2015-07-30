@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -28,15 +29,18 @@ import rx.functions.Func1;
 abstract class AbstractChallengesFragment extends AbstractFragment {
 
 	private final int titleResource;
+	private final int emptyResource;
 
 	@InjectView(R.id.list) private RecyclerView recyclerView;
 	private ChallengeAdapter challengeAdapter;
 	@Inject private ChallengeManager challengeManager;
+	@InjectView(R.id.txt_empty) private TextView emptyTextView;
 
 
-	public AbstractChallengesFragment(int layoutResource, int titleResource) {
+	public AbstractChallengesFragment(int layoutResource, int titleResource, int emptyResource) {
 		super(layoutResource);
 		this.titleResource = titleResource;
+		this.emptyResource = emptyResource;
 	}
 
 
@@ -71,6 +75,14 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 					@Override
 					public void call(List<ChallengeData> challenges) {
 						challengeAdapter.setData(challenges);
+
+						// toggle empty view
+						if (challenges.isEmpty()) {
+							emptyTextView.setVisibility(View.VISIBLE);
+							emptyTextView.setText(emptyResource);
+						} else {
+							emptyTextView.setVisibility(View.GONE);
+						}
 					}
 				});
 	}
