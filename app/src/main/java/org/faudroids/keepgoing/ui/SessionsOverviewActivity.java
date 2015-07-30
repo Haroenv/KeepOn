@@ -114,7 +114,7 @@ public class SessionsOverviewActivity extends AbstractActivity {
 				@Override
 				public void onClick(View v) {
 					Intent detailsIntent = new Intent(SessionsOverviewActivity.this, SessionDetailsActivity.class);
-					detailsIntent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, data.getSession().getIdentifier());
+					detailsIntent.putExtra(SessionDetailsActivity.EXTRA_SESSION, data.getSession().getIdentifier());
 					startActivity(detailsIntent);
 				}
 			});

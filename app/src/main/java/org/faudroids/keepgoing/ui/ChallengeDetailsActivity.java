@@ -178,7 +178,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(ChallengeDetailsActivity.this, SessionDetailsActivity.class);
-				intent.putExtra(SessionDetailsActivity.EXTRA_SESSION_ID, data.getSession().getIdentifier());
+				intent.putExtra(SessionDetailsActivity.EXTRA_SESSION, data);
 				startActivity(intent);
 			}
 		});
