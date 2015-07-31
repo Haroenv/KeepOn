@@ -15,6 +15,7 @@
     <string name="km_and_percentage_completed">%1$s km completed (%2$s%%)</string>
     <string name="hours_of_running">%1$s hours of running</string>
     <string name="all_activities">All activities</string>
+    <string name="no_activities">No activities yet</string>
     <string name="no_finished_challenges">No finished challenges yet</string>
     <string name="no_open_challenges">You have finished all challenges, congratulations!</string>
 

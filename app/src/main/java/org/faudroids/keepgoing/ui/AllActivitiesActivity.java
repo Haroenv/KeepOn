@@ -29,6 +29,7 @@ public class AllActivitiesActivity extends AbstractActivity {
 	static final String EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA";
 
 	@InjectView(R.id.list) private RecyclerView recyclerView;
+	@InjectView(R.id.txt_empty) private TextView emptyTextView;
 
 	public AllActivitiesActivity() {
 		super(true);
@@ -53,6 +54,10 @@ public class AllActivitiesActivity extends AbstractActivity {
 		List<SessionData> data = new ArrayList<>(challengeData.getSessionDataList());
 		Collections.reverse(data);
 		activitiesAdapter.setData(data);
+
+		// toggle empty view
+		if (data.isEmpty()) emptyTextView.setVisibility(View.VISIBLE);
+		else emptyTextView.setVisibility(View.GONE);
 	}
 
 
