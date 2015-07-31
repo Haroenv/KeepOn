@@ -80,6 +80,7 @@ public class MainDrawerActivity extends AbstractActivity implements Drawer.OnDra
 		Account account = authManager.getAccount();
 		AccountHeader accountHeader = new AccountHeaderBuilder()
 				.withActivity(this)
+				.withHeaderBackground(R.drawable.background)
 				.addProfiles(
 						new ProfileDrawerItem().withName(account.getName()).withEmail(account.getEmail()).withIcon(account.getImageUrl())
 				)
