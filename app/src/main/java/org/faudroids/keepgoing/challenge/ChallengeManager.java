@@ -120,6 +120,11 @@ public class ChallengeManager {
 					new Challenge(0, "Great Wall of China", 8851800, "None", "challenge_great_wall_of_china").insert();
 					new Challenge(0, "Run in the park", 11500, "None", "challenge_park").insert();
 					new Challenge(0, "Hong Kong Island", 16300, "None", "challenge_hong_kong").insert();
+					new Challenge(0, "Route 66", 3944000, "None", "challenge_route_66").insert();
+                    new Challenge(0, "Silk Road", 10000000, "None", "challenge_silk_road").insert();
+                    new Challenge(0, "Via Appia", 540000, "None", "challenge_via_appia").insert();
+                    new Challenge(0, "Great Ocean Road", 243000, "None", "challenge_great_ocean_road").insert();
+                    new Challenge(0, "Annapurna Circuit", 210000, "None", "challenge_annapurna_circuit").insert();
 				}
 				return Observable.just(null);
 			}
