@@ -120,7 +120,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 
 	private void setupChallengeProgress() {
 		// set completed kms
-		float completedPercentage = challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters();
+		float completedPercentage = (challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters()) * 100;
 		completedDistanceTextView.setText(getString(
 				R.string.km_and_percentage_completed,
 				String.format("%.1f", challengeData.getCompletedDistanceInMeters() / 1000),

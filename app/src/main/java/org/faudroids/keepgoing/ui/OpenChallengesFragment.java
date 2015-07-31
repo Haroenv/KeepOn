@@ -71,7 +71,7 @@ public class OpenChallengesFragment extends AbstractChallengesFragment {
 			imageView.setImageResource(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getActivity().getPackageName()));
 
 			// set completed info
-			float completedPercentage = challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters();
+			float completedPercentage = (challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters()) * 100;
 			completedTextView.setText(getString(R.string.percentage_completed, String.format("%.2f", completedPercentage)));
 
 			// set forward to details click listener
