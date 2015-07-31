@@ -2,8 +2,12 @@ package org.faudroids.keepgoing.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,8 +74,20 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.FontToolbarHeader);
 
 		// setup challenge overview
-		imageView.setImageResource(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getPackageName()));
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getPackageName()));
+		imageView.setImageBitmap(bitmap);
 		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
+
+		// setup toolbar color
+		Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+			@Override
+			public void onGenerated(Palette palette) {
+				collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(R.attr.colorPrimary));
+				if (Build.VERSION.SDK_INT >= 21) {
+					getWindow().setStatusBarColor(palette.getDarkMutedColor(R.attr.colorPrimaryDark));
+				}
+			}
+		});
 
 		// setup add session button
 		addSessionButton.setOnClickListener(new View.OnClickListener() {
