@@ -117,8 +117,9 @@ public class ChallengeManager {
 			public Observable<Void> call() {
 				if (firstStartPref.get()) {
 					firstStartPref.set(false);
-					Challenge challenge = new Challenge(0, "Great Wall of China", 8851800, "None", "challenge_great_wall_of_china");
-					challenge.insert();
+					new Challenge(0, "Great Wall of China", 8851800, "None", "challenge_great_wall_of_china").insert();
+					new Challenge(0, "Run in the park", 11500, "None", "challenge_park").insert();
+					new Challenge(0, "Hong Kong Island", 16300, "None", "challenge_hong_kong").insert();
 				}
 				return Observable.just(null);
 			}
