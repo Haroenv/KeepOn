@@ -4,4 +4,4 @@ if [ "$#" -ne 1 ]; then
 	exit 0
 fi
 
-convert $1 -resize x600 ../../src/main/res/drawable/$1
+convert $1 -resize x400 ../../src/main/res/drawable/$1

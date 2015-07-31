@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.challenge.ChallengeData;
 
@@ -68,7 +70,10 @@ public class OpenChallengesFragment extends AbstractChallengesFragment {
 			// setup view content
 			nameTextView.setText(challengeData.getChallenge().getName());
 			distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
-			imageView.setImageResource(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getActivity().getPackageName()));
+			Picasso
+					.with(getActivity())
+					.load(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getActivity().getPackageName()))
+					.into(imageView);
 
 			// set completed info
 			float completedPercentage = (challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters()) * 100;
