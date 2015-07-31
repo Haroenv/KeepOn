@@ -1,18 +1,10 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/green</item>
-        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@android:color/white</item>
         <item name="colorControlActivated">@color/blue</item>
-    </style>
-
-    <style name="DrawerTheme" parent="MaterialDrawerTheme.Light.DarkToolbar">
-        <item name="colorPrimary">@color/green</item>
-        <item name="colorPrimaryDark">@color/green_dark</item>
-        <item name="colorAccent">@android:color/white</item>
-        <item name="colorControlActivated">@color/blue</item>
-        <item name="material_drawer_background">@color/gray_dark</item>
     </style>
 
     <style name="FontDefault">
@@ -21,7 +13,7 @@
     </style>
 
     <style name="FontDefault.Green">
-        <item name="android:textColor">@color/green</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
     <style name="FontSecondary">
@@ -30,7 +22,7 @@
     </style>
 
     <style name="FontHeader">
-        <item name="android:textColor">@color/green</item>
+        <item name="android:textColor">@color/colorPrimary</item>
         <item name="android:textSize">22sp</item>
     </style>
 

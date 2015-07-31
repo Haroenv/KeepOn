@@ -70,7 +70,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 
 		// setup header
 		collapsingToolbarLayout.setTitle(challengeData.getChallenge().getName());
-		collapsingToolbarLayout.setContentScrimColor(getResources().getColor(R.color.green));
+		collapsingToolbarLayout.setContentScrimColor(getResources().getColor(R.color.colorPrimary));
 		collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.FontToolbarHeader);
 
 		// setup challenge overview

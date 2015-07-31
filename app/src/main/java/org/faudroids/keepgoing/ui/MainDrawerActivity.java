@@ -97,8 +97,8 @@ public class MainDrawerActivity extends AbstractActivity implements Drawer.OnDra
 						new PrimaryDrawerItem().withName(R.string.finished_challenges).withIdentifier(ID_FINISHED_CHALLENGES)
 				)
 				.addStickyDrawerItems(
-						new PrimaryDrawerItem().withName(R.string.settings).withIcon(R.drawable.ic_settings).withIdentifier(ID_SETTINGS),
-						new PrimaryDrawerItem().withName(R.string.feedback).withIcon(R.drawable.ic_email).withIdentifier(ID_FEEDBACK)
+						new PrimaryDrawerItem().withName(R.string.settings).withIconTintingEnabled(true).withIcon(R.drawable.ic_settings).withIdentifier(ID_SETTINGS),
+						new PrimaryDrawerItem().withName(R.string.feedback).withIconTintingEnabled(true).withIcon(R.drawable.ic_email).withIdentifier(ID_FEEDBACK)
 				)
 				.withOnDrawerItemClickListener(this)
 				.build();
