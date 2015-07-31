@@ -15,6 +15,9 @@
         android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="@dimen/list_padding_bottom"
+        android:paddingTop="@dimen/list_padding_top"
+        android:clipToPadding="false"
         />
 
     <TextView

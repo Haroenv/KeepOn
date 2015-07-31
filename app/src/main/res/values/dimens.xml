@@ -9,6 +9,7 @@
 
     <dimen name="map_bounds_padding">15dp</dimen>
 
+    <dimen name="list_padding_top">8dp</dimen>
     <dimen name="list_padding_bottom">128dp</dimen>
 
     <dimen name="user_photo_drawer_size">64dp</dimen>
