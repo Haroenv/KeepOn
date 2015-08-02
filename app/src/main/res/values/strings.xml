@@ -19,6 +19,9 @@
     <string name="new_activity">New activity</string>
     <string name="no_finished_challenges">No finished challenges yet</string>
     <string name="no_open_challenges">You have finished all challenges, congratulations!</string>
+    <string name="discarded_empty_recording">Discarded empty recording</string>
+    <string name="added_activity_success">Successfully recorded activity</string>
+    <string name="added_activity_error">Error while storing activity</string>
 
     <string name="duration">Duration</string>
     <string name="distance_in_km">Distance (km)</string>

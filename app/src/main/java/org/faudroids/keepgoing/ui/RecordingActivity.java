@@ -7,12 +7,14 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.MapView;
 
 import org.faudroids.keepgoing.R;
@@ -31,6 +33,7 @@ import javax.inject.Inject;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import rx.functions.Action1;
+import timber.log.Timber;
 
 @ContentView(R.layout.activity_recording)
 public class RecordingActivity extends AbstractMapActivity {
@@ -39,6 +42,7 @@ public class RecordingActivity extends AbstractMapActivity {
 
 	private static final String STATE_RECORDING_FINISHED = "STATE_RECORDING_FINISHED";
 
+	@InjectView(R.id.layout_container) private RelativeLayout containerLayout;
 	@InjectView(R.id.map) private MapView mapView;
 	@InjectView(R.id.txt_duration) private TextView durationTextView;
 	@InjectView(R.id.txt_distance) private TextView distanceTextView;
@@ -93,7 +97,6 @@ public class RecordingActivity extends AbstractMapActivity {
 				if (!recordingManager.isRecording()) {
 					// start recording
 					recordingManager.startRecording(googleApiClient, challenge);
-					Toast.makeText(RecordingActivity.this, "Recording started", Toast.LENGTH_SHORT).show();
 					toggleRunningText();
 					timeUpdateRunnable.start();
 
@@ -108,9 +111,16 @@ public class RecordingActivity extends AbstractMapActivity {
 								@Override
 								public void call(RecordingResult recordingResult) {
 									if (recordingResult.isRecordingDiscarded()) {
-										Toast.makeText(RecordingActivity.this, "Discarded empty recording", Toast.LENGTH_SHORT).show();
+										Snackbar.make(containerLayout, R.string.discarded_empty_recording, Snackbar.LENGTH_SHORT).show();
 									} else {
-										Toast.makeText(RecordingActivity.this, "Recording stopped successfully: " + recordingResult.getSaveRecordingStatus().isSuccess(), Toast.LENGTH_SHORT).show();
+										Status recordingStatus = recordingResult.getSaveRecordingStatus();
+										if (recordingStatus.isSuccess()) {
+											Snackbar.make(containerLayout, R.string.added_activity_success, Snackbar.LENGTH_SHORT).show();
+										} else {
+											Snackbar.make(containerLayout, R.string.added_activity_error, Snackbar.LENGTH_SHORT).show();
+											Timber.e("failed to store recording (" + recordingStatus.getStatusMessage() + ", " + recordingStatus.getStatusCode() + ", "
+													+ "has resolution " + (recordingStatus.getResolution() != null) + ")");
+										}
 									}
 									toggleRunningText();
 								}
