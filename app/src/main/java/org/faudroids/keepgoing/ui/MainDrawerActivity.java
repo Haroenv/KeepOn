@@ -94,8 +94,8 @@ public class MainDrawerActivity extends AbstractActivity implements Drawer.OnDra
 				.withToolbar(toolbar)
 				.withAccountHeader(accountHeader)
 				.addDrawerItems(
-						new PrimaryDrawerItem().withName(R.string.open_challenges).withIdentifier(ID_OPEN_CHALLENGES),
-						new PrimaryDrawerItem().withName(R.string.finished_challenges).withIdentifier(ID_FINISHED_CHALLENGES)
+						new PrimaryDrawerItem().withName(R.string.open_challenges).withIconTintingEnabled(true).withIcon(R.drawable.ic_directions_run_white_36dp).withIdentifier(ID_OPEN_CHALLENGES),
+						new PrimaryDrawerItem().withName(R.string.finished_challenges).withIconTintingEnabled(true).withIcon(R.drawable.ic_trophy).withIdentifier(ID_FINISHED_CHALLENGES)
 				)
 				.addStickyDrawerItems(
 						new PrimaryDrawerItem().withName(R.string.settings).withIconTintingEnabled(true).withIcon(R.drawable.ic_settings).withIdentifier(ID_SETTINGS),
