@@ -187,9 +187,8 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		}
 
 		// hide activities card if empty
-		if (newestSessions.isEmpty()) {
-			recentActivitiesCard.setVisibility(View.GONE);
-		}
+		if (newestSessions.isEmpty()) recentActivitiesCard.setVisibility(View.GONE);
+		else recentActivitiesCard.setVisibility(View.VISIBLE);
 	}
 
 
