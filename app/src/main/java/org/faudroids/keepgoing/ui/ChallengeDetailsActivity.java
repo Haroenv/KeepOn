@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,8 +51,10 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@InjectView(R.id.txt_distance_completed) private TextView completedDistanceTextView;
 	@InjectView(R.id.txt_time) private TextView timeTextView;
 	@InjectView(R.id.btn_add_session) private FloatingActionButton addSessionButton;
+
+	@InjectView(R.id.card_recent_activities) private CardView recentActivitiesCard;
 	@InjectView(R.id.txt_recent_activities) private TextView recentActivitiesTextView;
-	@InjectView(R.id.layout_recent_activities) private LinearLayout recentActivitesLayout;
+	@InjectView(R.id.layout_recent_activities) private LinearLayout recentActivitiesLayout;
 
 	@Inject private ChallengeManager challengeManager;
 	private ChallengeData challengeData;
@@ -155,7 +158,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		}
 
 		// create views
-		recentActivitesLayout.removeAllViews();
+		recentActivitiesLayout.removeAllViews();
 		boolean firstIter = true;
 		for (SessionData session : newestSessions) {
 			// add separator
@@ -165,14 +168,19 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 						getResources().getDimensionPixelSize(R.dimen.one_dp));
 				int margin = getResources().getDimensionPixelSize(R.dimen.recent_activities_margin);
 				layoutParams.setMargins(margin, 0, 0, 0);
-				recentActivitesLayout.addView(createSeparatorView(recentActivitesLayout), layoutParams);
+				recentActivitiesLayout.addView(createSeparatorView(recentActivitiesLayout), layoutParams);
 			}
 			if (firstIter) firstIter = false;
 
 			// add activity view
-			recentActivitesLayout.addView(
-					createRecentActivityView(recentActivitesLayout, session),
+			recentActivitiesLayout.addView(
+					createRecentActivityView(recentActivitiesLayout, session),
 					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		}
+
+		// hide activities card if empty
+		if (newestSessions.isEmpty()) {
+			recentActivitiesCard.setVisibility(View.GONE);
 		}
 	}
 
