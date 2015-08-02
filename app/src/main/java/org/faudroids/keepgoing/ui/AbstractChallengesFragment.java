@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.challenge.ChallengeData;
@@ -34,7 +35,9 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 	@InjectView(R.id.list) private RecyclerView recyclerView;
 	private ChallengeAdapter challengeAdapter;
 	@Inject private ChallengeManager challengeManager;
+
 	@InjectView(R.id.txt_empty) private TextView emptyTextView;
+	@InjectView(R.id.progressbar) private CircleProgressBar progressBar;
 
 
 	public AbstractChallengesFragment(int layoutResource, int titleResource, int emptyResource) {
@@ -68,6 +71,7 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 	@Override
 	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
+		progressBar.setVisibility(View.VISIBLE);
 		challengeManager.getAllChallenges(googleApiClient)
 				.flatMap(filterChallenges())
 				.compose(new DefaultTransformer<List<ChallengeData>>())
@@ -75,6 +79,7 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 					@Override
 					public void call(List<ChallengeData> challenges) {
 						challengeAdapter.setData(challenges);
+						progressBar.setVisibility(View.GONE);
 
 						// toggle empty view
 						if (challenges.isEmpty()) {

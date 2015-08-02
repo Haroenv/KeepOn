@@ -53,6 +53,9 @@ dependencies {
     compile 'com.jakewharton.timber:timber:3.1.0'
     compile 'com.google.android.gms:play-services-plus:7.5.0'
     compile 'com.google.android.gms:play-services-fitness:7.5.0'
+    compile('com.lsjwzh:materialloadingprogressbar:0.5.6-RELEASE') {
+        exclude group: 'com.android.support'
+    }
     compile 'io.reactivex:rxjava:1.0.12'
     compile 'io.reactivex:rxandroid:0.25.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
