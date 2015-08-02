@@ -36,10 +36,13 @@ import javax.inject.Inject;
 import roboguice.inject.ContentView;
 import roboguice.inject.InjectView;
 import rx.functions.Action1;
+import timber.log.Timber;
 
 
 @ContentView(R.layout.activity_challenge_details)
 public class ChallengeDetailsActivity extends AbstractActivity {
+
+	public static final int RESULT_FINISHED_CHALLENGE = 42;
 
 	public static final String
 			EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA",
@@ -164,6 +167,15 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putBoolean(STATE_HIDING_RECORDING_BUTTON, hidingRecordingButton);
 		super.onSaveInstanceState(outState);
+	}
+
+
+	@Override
+	public void onBackPressed() {
+		if (!challengeData.isOpen()) {
+			setResult(RESULT_FINISHED_CHALLENGE);
+		}
+		super.onBackPressed();
 	}
 
 

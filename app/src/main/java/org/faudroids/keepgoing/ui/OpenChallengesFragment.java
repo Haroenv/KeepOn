@@ -21,6 +21,8 @@ import rx.functions.Func1;
 
 public class OpenChallengesFragment extends AbstractChallengesFragment {
 
+	private static final int REQUEST_SHOW_CHALLENGE_DETAILS = 42;
+
 	public OpenChallengesFragment() {
 		super(R.layout.fragment_challenge_overview, R.string.open_challenges, R.string.no_open_challenges);
 	}
@@ -47,6 +49,16 @@ public class OpenChallengesFragment extends AbstractChallengesFragment {
 				.from(viewGroup.getContext())
 				.inflate(R.layout.card_challenge_open, viewGroup, false);
 		return new ChallengeViewHolder(view);
+	}
+
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case REQUEST_SHOW_CHALLENGE_DETAILS:
+				if (resultCode != ChallengeDetailsActivity.RESULT_FINISHED_CHALLENGE) return;
+				setupChallengesList();
+		}
 	}
 
 
@@ -85,7 +97,7 @@ public class OpenChallengesFragment extends AbstractChallengesFragment {
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), ChallengeDetailsActivity.class);
 					intent.putExtra(ChallengeDetailsActivity.EXTRA_CHALLENGE_DATA, challengeData);
-					startActivity(intent);
+					startActivityForResult(intent, REQUEST_SHOW_CHALLENGE_DETAILS);
 				}
 			});
 		}

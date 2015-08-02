@@ -71,8 +71,13 @@ abstract class AbstractChallengesFragment extends AbstractFragment {
 	@Override
 	public void onGoogleApiClientConnected(final GoogleApiClient googleApiClient) {
 		super.onGoogleApiClientConnected(googleApiClient);
+		setupChallengesList();
+	}
+
+
+	protected void setupChallengesList() {
 		progressBar.setVisibility(View.VISIBLE);
-		challengeManager.getAllChallenges(googleApiClient)
+		challengeManager.getAllChallenges(googleApiClientObserver.getGoogleApiClient())
 				.flatMap(filterChallenges())
 				.compose(new DefaultTransformer<List<ChallengeData>>())
 				.subscribe(new Action1<List<ChallengeData>>() {
