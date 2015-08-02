@@ -1,5 +1,6 @@
 package org.faudroids.keepgoing.ui;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,11 +57,13 @@ public class FinishedChallengesFragment extends AbstractChallengesFragment {
 
 	private class ChallengeViewHolder extends AbstractChallengeViewHolder {
 
+		private final View containerView;
 		private final TextView nameTextView, distanceTextView, timeTextView;
 		private final ImageView challengeImageView, userImageView;
 
 		public ChallengeViewHolder(View itemView) {
 			super(itemView);
+			this.containerView = itemView.findViewById(R.id.container);
 			this.nameTextView = (TextView) itemView.findViewById(R.id.txt_name);
 			this.distanceTextView = (TextView) itemView.findViewById(R.id.txt_distance);
 			this.timeTextView = (TextView) itemView.findViewById(R.id.txt_time);
@@ -83,6 +86,17 @@ public class FinishedChallengesFragment extends AbstractChallengesFragment {
 			distanceTextView.setText(getString(R.string.distance_km, String.format("%.1f", challengeData.getCompletedDistanceInMeters() / 1000f)));
 			float hours = challengeData.getCompletedTimeInSeconds() / (60.0f * 60.0f);
 			timeTextView.setText(getString(R.string.hours_of_running, String.format("%.1f", hours)));
+
+			// setup on click
+			containerView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(getActivity(), ChallengeDetailsActivity.class);
+					intent.putExtra(ChallengeDetailsActivity.EXTRA_CHALLENGE_DATA, challengeData);
+					intent.putExtra(ChallengeDetailsActivity.EXTRA_HIDE_RECORDING_BUTTON, true);
+					startActivity(intent);
+				}
+			});
 		}
 
 	}

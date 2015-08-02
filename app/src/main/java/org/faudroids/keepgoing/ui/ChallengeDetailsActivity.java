@@ -39,7 +39,9 @@ import rx.functions.Action1;
 @ContentView(R.layout.activity_challenge_details)
 public class ChallengeDetailsActivity extends AbstractActivity {
 
-	public static final String EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA";
+	public static final String
+			EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA",
+			EXTRA_HIDE_RECORDING_BUTTON = "EXTRA_HIDE_RECORDING_BUTTON";
 
 	private static final int REQUEST_START_RECORDING = 42;
 
@@ -96,6 +98,8 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		});
 
 		// setup add session button
+		boolean hideRecordingButton = getIntent().getBooleanExtra(EXTRA_HIDE_RECORDING_BUTTON, false);
+		if (hideRecordingButton) addSessionButton.setVisibility(View.GONE);
 		addSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
