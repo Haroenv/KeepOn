@@ -1,5 +1,6 @@
 package org.faudroids.keepgoing.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +27,18 @@ import roboguice.inject.InjectView;
 @ContentView(R.layout.activity_all_activities)
 public class AllActivitiesActivity extends AbstractActivity {
 
-	static final String EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA";
+	public static Intent createIntent(Context context, ChallengeData challengeData, int toolbarColor, int statusbarColor) {
+		Intent intent = new Intent(context, AllActivitiesActivity.class);
+		intent.putExtra(EXTRA_CHALLENGE_DATA, challengeData);
+		intent.putExtra(EXTRA_TOOLBAR_COLOR, toolbarColor);
+		intent.putExtra(EXTRA_STATUSBAR_COLOR, statusbarColor);
+		return intent;
+	}
+
+	static final String
+			EXTRA_CHALLENGE_DATA = "EXTRA_CHALLENGE_DATA",
+			EXTRA_TOOLBAR_COLOR = "EXTRA_TOOLBAR_COLOR",
+			EXTRA_STATUSBAR_COLOR = "EXTRA_STATUSBAR_COLOR";
 
 	@InjectView(R.id.list) private RecyclerView recyclerView;
 	@InjectView(R.id.txt_empty) private TextView emptyTextView;
@@ -40,8 +52,12 @@ public class AllActivitiesActivity extends AbstractActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setTitle(R.string.all_activities);
 		ChallengeData challengeData = getIntent().getParcelableExtra(EXTRA_CHALLENGE_DATA);
+
+		// setup toolbar
+		setTitle(R.string.all_activities);
+		toolbar.setBackgroundColor(getIntent().getIntExtra(EXTRA_TOOLBAR_COLOR, 0));
+		setStatusBarColor(getIntent().getIntExtra(EXTRA_STATUSBAR_COLOR, 0));
 
 		// setup activities list
 		RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -108,9 +124,11 @@ public class AllActivitiesActivity extends AbstractActivity {
 			itemView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(AllActivitiesActivity.this, SessionDetailsActivity.class);
-					intent.putExtra(SessionDetailsActivity.EXTRA_SESSION, data);
-					startActivity(intent);
+					startActivity(SessionDetailsActivity.createIntent(
+							AllActivitiesActivity.this,
+							data,
+							getIntent().getIntExtra(EXTRA_TOOLBAR_COLOR, 0),
+							getIntent().getIntExtra(EXTRA_STATUSBAR_COLOR, 0)));
 				}
 			});
 		}

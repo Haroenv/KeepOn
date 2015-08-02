@@ -1,6 +1,7 @@
 package org.faudroids.keepgoing.ui;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
@@ -38,7 +39,19 @@ import timber.log.Timber;
 @ContentView(R.layout.activity_recording)
 public class RecordingActivity extends AbstractMapActivity {
 
-	public static final String EXTRA_CHALLENGE = "EXTRA_CHALLENGE_DATA";
+	public static Intent createIntent(Context context, Challenge challenge, int toolbarColor, int statusbarColor) {
+		Intent intent = new Intent(context, RecordingActivity.class);
+		intent.putExtra(EXTRA_CHALLENGE, challenge);
+		intent.putExtra(EXTRA_TOOLBAR_COLOR, toolbarColor);
+		intent.putExtra(EXTRA_STATUSBAR_COLOR, statusbarColor);
+		return intent;
+	}
+
+	static final String
+			EXTRA_CHALLENGE = "EXTRA_CHALLENGE",
+			EXTRA_TOOLBAR_COLOR = "EXTRA_TOOLBAR_COLOR",
+			EXTRA_STATUSBAR_COLOR = "EXTRA_STATUSBAR_COLOR";
+
 
 	private static final String STATE_RECORDING_FINISHED = "STATE_RECORDING_FINISHED";
 
@@ -65,7 +78,11 @@ public class RecordingActivity extends AbstractMapActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// setup toolbar
 		setTitle(R.string.new_activity);
+		toolbar.setBackgroundColor(getIntent().getIntExtra(EXTRA_TOOLBAR_COLOR, 0));
+		setStatusBarColor(getIntent().getIntExtra(EXTRA_STATUSBAR_COLOR, 0));
 
 		// check for GPS
 		if (!isGpsEnabled()) showEnableGpsDialog();

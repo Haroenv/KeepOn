@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.Toolbar;
@@ -170,6 +171,13 @@ abstract class AbstractActivity extends RoboActionBarActivity implements Service
 		// notify existing listeners
 		for (GoogleApiClientListener listener : listeners) {
 			listener.onGoogleAliClientConnectionFailed(connectionResult);
+		}
+	}
+
+
+	protected void setStatusBarColor(int statusBarColor) {
+		if (Build.VERSION.SDK_INT >= 21) {
+			getWindow().setStatusBarColor(statusBarColor);
 		}
 	}
 

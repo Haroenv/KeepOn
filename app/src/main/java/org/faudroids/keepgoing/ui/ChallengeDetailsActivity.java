@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.graphics.Palette;
@@ -59,6 +58,8 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	@Inject private ChallengeManager challengeManager;
 	private ChallengeData challengeData;
 
+	private int toolbarColor, statusbarColor;
+
 
 	public ChallengeDetailsActivity() {
 		super(true);
@@ -82,13 +83,15 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
 
 		// setup toolbar color
-		Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+		toolbarColor = getResources().getColor(R.color.colorPrimary);
+		statusbarColor = getResources().getColor(R.color.colorPrimaryDark);
+		Palette.from(bitmap).maximumColorCount(32).generate(new Palette.PaletteAsyncListener() {
 			@Override
 			public void onGenerated(Palette palette) {
-				collapsingToolbarLayout.setContentScrimColor(palette.getMutedColor(R.attr.colorPrimary));
-				if (Build.VERSION.SDK_INT >= 21) {
-					getWindow().setStatusBarColor(palette.getDarkMutedColor(R.attr.colorPrimaryDark));
-				}
+				toolbarColor = palette.getMutedColor(toolbarColor);
+				statusbarColor = palette.getDarkMutedColor(statusbarColor);
+				collapsingToolbarLayout.setContentScrimColor(toolbarColor);
+				setStatusBarColor(statusbarColor);
 			}
 		});
 
@@ -96,9 +99,12 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		addSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(ChallengeDetailsActivity.this, RecordingActivity.class);
-				intent.putExtra(RecordingActivity.EXTRA_CHALLENGE, challengeData.getChallenge());
-				startActivityForResult(intent, REQUEST_START_RECORDING);
+				startActivityForResult(RecordingActivity.createIntent(
+						ChallengeDetailsActivity.this,
+						challengeData.getChallenge(),
+						toolbarColor,
+						statusbarColor),
+						REQUEST_START_RECORDING);
 			}
 		});
 
@@ -109,9 +115,11 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		recentActivitiesTextView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(ChallengeDetailsActivity.this, AllActivitiesActivity.class);
-				intent.putExtra(AllActivitiesActivity.EXTRA_CHALLENGE_DATA, challengeData);
-				startActivity(intent);
+				startActivity(AllActivitiesActivity.createIntent(
+						ChallengeDetailsActivity.this,
+						challengeData,
+						toolbarColor,
+						statusbarColor));
 			}
 		});
 	}
@@ -201,9 +209,11 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		itemView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(ChallengeDetailsActivity.this, SessionDetailsActivity.class);
-				intent.putExtra(SessionDetailsActivity.EXTRA_SESSION, data);
-				startActivity(intent);
+				startActivity(SessionDetailsActivity.createIntent(
+						ChallengeDetailsActivity.this,
+						data,
+						toolbarColor,
+						statusbarColor));
 			}
 		});
 

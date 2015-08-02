@@ -1,5 +1,7 @@
 package org.faudroids.keepgoing.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.widget.Button;
@@ -22,7 +24,18 @@ import roboguice.inject.InjectView;
 @ContentView(R.layout.activity_recording)
 public class SessionDetailsActivity extends AbstractMapActivity {
 
-	static final String EXTRA_SESSION = "EXTRA_SESSION";
+	public static Intent createIntent(Context context, SessionData sessionData, int toolbarColor, int statusbarColor) {
+		Intent intent = new Intent(context, SessionDetailsActivity.class);
+		intent.putExtra(EXTRA_SESSION, sessionData);
+		intent.putExtra(EXTRA_TOOLBAR_COLOR, toolbarColor);
+		intent.putExtra(EXTRA_STATUSBAR_COLOR, statusbarColor);
+		return intent;
+	}
+
+	static final String
+			EXTRA_SESSION = "EXTRA_SESSION",
+			EXTRA_TOOLBAR_COLOR = "EXTRA_TOOLBAR_COLOR",
+			EXTRA_STATUSBAR_COLOR = "EXTRA_STATUSBAR_COLOR";
 
 	private static final DecimalFormat timeFormat = new DecimalFormat("00");
 
@@ -44,8 +57,10 @@ public class SessionDetailsActivity extends AbstractMapActivity {
 		startRecordingButton.setVisibility(TextView.GONE);
 		sessionData = getIntent().getParcelableExtra(EXTRA_SESSION);
 
-		// set title
+		// setup toolbar
 		setTitle(SimpleDateFormat.getDateInstance().format(new Date(sessionData.getSession().getStartTime(TimeUnit.MILLISECONDS))));
+		toolbar.setBackgroundColor(getIntent().getIntExtra(EXTRA_TOOLBAR_COLOR, 0));
+		setStatusBarColor(getIntent().getIntExtra(EXTRA_STATUSBAR_COLOR, 0));
 
 		// update distance
 		float distanceInMeters = 0;
