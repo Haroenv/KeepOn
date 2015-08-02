@@ -1,16 +1,58 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/gray_light"
     >
 
-    <include layout="@layout/toolbar" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:paddingBottom="60dp"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher_large"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to"
+            android:layout_gravity="center_horizontal"
+            android:textSize="25sp"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/gray_dark"
+            android:gravity="center"
+            style="@style/FontHeader"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:layout_gravity="center_horizontal"
+            android:textSize="30sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:gravity="center"
+            style="@style/FontHeader"
+            />
+
+    </LinearLayout>
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btn_sign_in"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="15dp"
         />
 
-</LinearLayout>
+</RelativeLayout>

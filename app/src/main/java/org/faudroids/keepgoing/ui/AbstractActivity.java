@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import roboguice.activity.RoboActionBarActivity;
-import roboguice.inject.InjectView;
 
 
 /**
@@ -34,7 +33,7 @@ import roboguice.inject.InjectView;
  */
 abstract class AbstractActivity extends RoboActionBarActivity implements ServiceConnection, GoogleApiClientListener, GoogleApiClientObserver {
 
-	@InjectView(R.id.toolbar) protected Toolbar toolbar;
+	protected Toolbar toolbar;
 	private final boolean showBackButton;
 
 	private GoogleApiClientService apiClientService = null;
@@ -55,10 +54,13 @@ abstract class AbstractActivity extends RoboActionBarActivity implements Service
 		super.onCreate(savedInstanceState);
 
 		// setup toolbar
-		setSupportActionBar(toolbar);
-		if (showBackButton) {
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-			getSupportActionBar().setDisplayShowHomeEnabled(true);
+		toolbar = (Toolbar) findViewById(R.id.toolbar);
+		if (toolbar != null) {
+			setSupportActionBar(toolbar);
+			if (showBackButton) {
+				getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+				getSupportActionBar().setDisplayShowHomeEnabled(true);
+			}
 		}
 	}
 
