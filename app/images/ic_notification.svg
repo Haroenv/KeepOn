@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="24"
+   height="24"
+   viewBox="0 0 23.999999 24.000001"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r"
+   sodipodi:docname="ic_notification.svg"
+   inkscape:export-filename="/home/maddoc/android/KeepGoing/app/images/launcher.png"
+   inkscape:export-xdpi="562.5"
+   inkscape:export-ydpi="562.5">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="22.356841"
+     inkscape:cx="18.910656"
+     inkscape:cy="19.905873"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:object-paths="true"
+     inkscape:object-nodes="true"
+     inkscape:snap-smooth-nodes="true"
+     inkscape:bbox-paths="true"
+     inkscape:window-width="1916"
+     inkscape:window-height="1143"
+     inkscape:window-x="1680"
+     inkscape:window-y="36"
+     inkscape:window-maximized="0"
+     borderlayer="true"
+     units="px"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:snap-global="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4142"
+       spacingx="10"
+       spacingy="9.9999995"
+       visible="true"
+       enabled="false"
+       originx="271.47027"
+       originy="100.73189" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(271.47028,-1129.0939)">
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4476"
+       width="95.362312"
+       height="91.426155"
+       x="-411.17422"
+       y="1097.233" />
+    <path
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m -261.17891,1130.24 -7.87735,0.364 -1.21229,9.2601 1.21229,10.4944 3.63686,0.6177 6.66907,0.9716 9.7003,-1.5893 0.22762,-6.7904 0.1504,-5.5561 -0.98467,-6.1727 -3.03121,0 z m 3.1222,3.2328 c 0.79826,0 1.45081,0.654 1.45081,1.4522 0,0.7983 -0.65255,1.4507 -1.45081,1.4507 -0.79825,0 -1.45213,-0.6524 -1.45213,-1.4507 0,-0.7982 0.65388,-1.4522 1.45213,-1.4522 z m -1.08876,3.2664 c 0.50798,0 0.94277,0.2899 1.23304,0.7254 l 0.72541,1.1608 c 0.58056,1.016 1.74188,1.7421 3.12069,1.7421 l 0,1.4508 c -1.59651,0 -3.04698,-0.7256 -3.99038,-1.8142 l -0.43551,2.1776 1.52295,1.4508 0,5.4425 -1.45081,0 0,-4.3538 -1.52427,-1.4507 -0.72541,3.1928 -5.08048,-1.0167 0.29123,-1.4508 3.55487,0.7254 1.16225,-5.8779 -1.30653,0.5076 0,2.4674 -1.45215,0 0,-3.4106 3.77397,-1.5965 c 0.21771,0 0.36342,-0.072 0.58113,-0.072 z"
+       id="path4606"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccccccccssssscccccccccccccccccccccccc" />
+    <path
+       style="fill:none"
+       inkscape:connector-curvature="0"
+       d="m 44.450936,337.48446 24,0 0,24 -24,0 z"
+       id="path4617" />
+    <g
+       id="g5379"
+       transform="translate(78.255949,14.672763)" />
+  </g>
+</svg>

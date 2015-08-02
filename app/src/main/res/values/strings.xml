@@ -22,6 +22,7 @@
     <string name="discarded_empty_recording">Discarded empty recording</string>
     <string name="added_activity_success">Successfully recorded activity</string>
     <string name="added_activity_error">Error while storing activity</string>
+    <string name="recording_new_activity">Recording new activity</string>
 
     <string name="duration">Duration</string>
     <string name="distance_in_km">Distance (km)</string>
