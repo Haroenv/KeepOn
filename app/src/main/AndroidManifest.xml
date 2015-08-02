@@ -30,19 +30,7 @@
             android:screenOrientation="portrait"
             />
         <activity
-            android:name="org.faudroids.keepon.ui.GoogleFitDemoActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity
-            android:name="org.faudroids.keepon.ui.MapsActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity
             android:name="org.faudroids.keepon.ui.RecordingActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity
-            android:name="org.faudroids.keepon.ui.SessionsOverviewActivity"
             android:screenOrientation="portrait"
             />
         <activity
