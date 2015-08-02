@@ -3,7 +3,6 @@ package org.faudroids.keepgoing.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.graphics.Palette;
@@ -16,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import org.faudroids.keepgoing.R;
 import org.faudroids.keepgoing.challenge.ChallengeData;
@@ -80,22 +81,15 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.FontToolbarHeader);
 
 		// setup challenge overview
-		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getPackageName()));
-		imageView.setImageBitmap(bitmap);
+		Picasso.with(this)
+				.load(getResources().getIdentifier(challengeData.getChallenge().getImageName(), "drawable", getPackageName()))
+				.transform(new ToolbarColorTransformation())
+				.into(imageView);
 		distanceTextView.setText(getString(R.string.distance_km, String.valueOf(challengeData.getChallenge().getDistanceInMeters() / 1000)));
 
-		// setup toolbar color
+		// setup default toolbar colors
 		toolbarColor = getResources().getColor(R.color.colorPrimary);
 		statusbarColor = getResources().getColor(R.color.colorPrimaryDark);
-		Palette.from(bitmap).maximumColorCount(32).generate(new Palette.PaletteAsyncListener() {
-			@Override
-			public void onGenerated(Palette palette) {
-				toolbarColor = palette.getMutedColor(toolbarColor);
-				statusbarColor = palette.getDarkMutedColor(statusbarColor);
-				collapsingToolbarLayout.setContentScrimColor(toolbarColor);
-				setStatusBarColor(statusbarColor);
-			}
-		});
 
 		// setup add session button
 		boolean hideRecordingButton = getIntent().getBooleanExtra(EXTRA_HIDE_RECORDING_BUTTON, false);
@@ -227,6 +221,28 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	private View createSeparatorView(ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		return inflater.inflate(R.layout.separator, parent, false);
+	}
+
+
+	private class ToolbarColorTransformation implements Transformation {
+		@Override
+		public Bitmap transform(Bitmap source) {
+			Palette.from(source).maximumColorCount(32).generate(new Palette.PaletteAsyncListener() {
+				@Override
+				public void onGenerated(Palette palette) {
+					toolbarColor = palette.getMutedColor(toolbarColor);
+					statusbarColor = palette.getDarkMutedColor(statusbarColor);
+					collapsingToolbarLayout.setContentScrimColor(toolbarColor);
+					setStatusBarColor(statusbarColor);
+				}
+			});
+			return source;
+		}
+
+		@Override
+		public String key() {
+			return "toolbar";
+		}
 	}
 
 }

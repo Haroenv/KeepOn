@@ -29,7 +29,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/challenge_great_wall_of_china"
                 android:fitsSystemWindows="true"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.7"
