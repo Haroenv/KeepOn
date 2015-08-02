@@ -61,6 +61,7 @@ public class RecordingActivity extends AbstractMapActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setTitle(R.string.new_activity);
 
 		// check for GPS
 		if (!isGpsEnabled()) showEnableGpsDialog();
