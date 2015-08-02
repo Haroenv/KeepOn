@@ -24,6 +24,9 @@
     <string name="added_activity_error">Error while storing activity</string>
     <string name="recording_new_activity">Recording new activity</string>
 
+    <string name="challenge_finished">Challenge finished</string>
+    <string name="challenge_finished_message">Congratulations, you have finished this challenge!</string>
+
     <string name="duration">Duration</string>
     <string name="distance_in_km">Distance (km)</string>
     <string name="avg_speed_in_kmh">Avg. Speed (km/h)</string>

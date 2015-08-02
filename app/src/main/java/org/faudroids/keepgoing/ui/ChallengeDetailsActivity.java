@@ -1,5 +1,6 @@
 package org.faudroids.keepgoing.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -46,6 +47,8 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 
 	private static final int REQUEST_START_RECORDING = 42;
 
+	private static final String STATE_HIDING_RECORDING_BUTTON = "HIDING_RECORDING_BUTTON";
+
 	@InjectView(R.id.img_challenge) private ImageView imageView;
 	@InjectView(R.id.collapsing_toolbar) private CollapsingToolbarLayout collapsingToolbarLayout;
 
@@ -62,6 +65,7 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	private ChallengeData challengeData;
 
 	private int toolbarColor, statusbarColor;
+	private boolean hidingRecordingButton;
 
 
 	public ChallengeDetailsActivity() {
@@ -74,6 +78,8 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		super.onCreate(savedInstanceState);
 
 		challengeData = getIntent().getParcelableExtra(EXTRA_CHALLENGE_DATA);
+		hidingRecordingButton = getIntent().getBooleanExtra(EXTRA_HIDE_RECORDING_BUTTON, false);
+		if (savedInstanceState != null) hidingRecordingButton = savedInstanceState.getBoolean(STATE_HIDING_RECORDING_BUTTON);
 
 		// setup header
 		collapsingToolbarLayout.setTitle(challengeData.getChallenge().getName());
@@ -92,8 +98,6 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 		statusbarColor = getResources().getColor(R.color.colorPrimaryDark);
 
 		// setup add session button
-		boolean hideRecordingButton = getIntent().getBooleanExtra(EXTRA_HIDE_RECORDING_BUTTON, false);
-		if (hideRecordingButton) addSessionButton.setVisibility(View.GONE);
 		addSessionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -134,8 +138,21 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 						.subscribe(new Action1<ChallengeData>() {
 							@Override
 							public void call(ChallengeData challengeData) {
+								// check if challenge has been finished
+								if (!challengeData.isOpen()) {
+									hidingRecordingButton = true;
+									new AlertDialog.Builder(ChallengeDetailsActivity.this)
+											.setTitle(R.string.challenge_finished)
+											.setMessage(R.string.challenge_finished_message)
+											.setPositiveButton(android.R.string.ok, null)
+											.setIcon(R.drawable.ic_trophy)
+											.show();
+								}
+
+								// update stats
 								ChallengeDetailsActivity.this.challengeData = challengeData;
 								setupChallengeProgress();
+
 							}
 						});
 				break;
@@ -143,7 +160,17 @@ public class ChallengeDetailsActivity extends AbstractActivity {
 	}
 
 
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putBoolean(STATE_HIDING_RECORDING_BUTTON, hidingRecordingButton);
+		super.onSaveInstanceState(outState);
+	}
+
+
 	private void setupChallengeProgress() {
+		// toggle recording button
+		if (hidingRecordingButton) addSessionButton.setVisibility(View.GONE);
+
 		// set completed kms
 		float completedPercentage = (challengeData.getCompletedDistanceInMeters() / challengeData.getChallenge().getDistanceInMeters()) * 100;
 		completedDistanceTextView.setText(getString(
