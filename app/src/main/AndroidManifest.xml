@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.faudroids.keepgoing" >
+    package="org.faudroids.keepon" >
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -14,10 +14,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name=".app.KeepGoingApp"
+        android:name="org.faudroids.keepon.app.KeepOnApp"
         >
         <activity
-            android:name=".ui.LoginActivity"
+            android:name="org.faudroids.keepon.ui.LoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,44 +25,44 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.MainDrawerActivity"
+            android:name="org.faudroids.keepon.ui.MainDrawerActivity"
             android:theme="@style/MaterialDrawerTheme.Light.DarkToolbar"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".ui.GoogleFitDemoActivity"
+            android:name="org.faudroids.keepon.ui.GoogleFitDemoActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".ui.MapsActivity"
+            android:name="org.faudroids.keepon.ui.MapsActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".ui.RecordingActivity"
+            android:name="org.faudroids.keepon.ui.RecordingActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".ui.SessionsOverviewActivity"
+            android:name="org.faudroids.keepon.ui.SessionsOverviewActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".ui.SessionDetailsActivity"
+            android:name="org.faudroids.keepon.ui.SessionDetailsActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".ui.ChallengeDetailsActivity"
+            android:name="org.faudroids.keepon.ui.ChallengeDetailsActivity"
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".ui.AllActivitiesActivity"
+            android:name="org.faudroids.keepon.ui.AllActivitiesActivity"
             android:screenOrientation="portrait"
             />
         <service
-            android:name=".googleapi.GoogleApiClientService"
+            android:name="org.faudroids.keepon.googleapi.GoogleApiClientService"
             android:screenOrientation="portrait"
             />
         <service
-            android:name=".recording.RecordingService"
+            android:name="org.faudroids.keepon.recording.RecordingService"
             android:screenOrientation="portrait"
             />
 
@@ -76,7 +76,7 @@
             />
         <meta-data
             android:name="roboguice.annotations.packages"
-            android:value="roboguice,org.faudroids.keepgoing"
+            android:value="roboguice,org.faudroids.keepon"
             />
         <meta-data
             android:name="io.fabric.ApiKey"

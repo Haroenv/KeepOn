@@ -24,7 +24,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "org.faudroids.keepgoing"
+        applicationId "org.faudroids.keepon"
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 1
@@ -40,7 +40,7 @@ android {
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) {
-        options.compilerArgs << "-AguiceAnnotationDatabasePackageName=org.faudroids.keepgoing"
+        options.compilerArgs << "-AguiceAnnotationDatabasePackageName=org.faudroids.keepon"
     }
 }
 

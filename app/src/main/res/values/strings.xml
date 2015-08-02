@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KeepGoing</string>
+    <string name="app_name">KeepOn</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
@@ -40,10 +40,10 @@
     <string name="about">About</string>
     <string name="about_msg">
         This app was developed as part of the Android Challenge: one app every month for one year
-        (think of it as a New Year\'s resolution). KeepGoing is our project for July.&lt;br/&gt;
+        (think of it as a New Year\'s resolution). KeepOn is our project for July.&lt;br/&gt;
         &lt;br/&gt;
         If you want to know more, be sure to check out our &lt;a href=&quot;http://faudroids.org&quot;&gt;website&lt;/a&gt;.
-        This app is &lt;b&gt;open source&lt;/b&gt; and you can find everything on &lt;a href=&quot;https://github.com/FauDroids/KeepGoing&quot;&gt;GitHub&lt;/a&gt;.&lt;br/&gt;
+        This app is &lt;b&gt;open source&lt;/b&gt; and you can find everything on &lt;a href=&quot;https://github.com/FauDroids/KeepOn&quot;&gt;GitHub&lt;/a&gt;.&lt;br/&gt;
         &lt;br/&gt;
         We would love to hear from you! Send us an &lt;a href=&quot;mailto:ideas@faudroids.org&quot;&gt;email&lt;/a&gt; and let us know what you think!&lt;br/&gt;
         &lt;br/&gt;
